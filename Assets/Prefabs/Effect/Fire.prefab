@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9176418181503924478
 Transform:
   m_ObjectHideFlags: 0
@@ -1307,30 +1307,30 @@ ParticleSystem:
         serializedVersion: 2
         key0: {r: 1, g: 0.97351444, b: 0, a: 0}
         key1: {r: 0.8773585, g: 0.7298193, b: 0.11173906, a: 1}
-        key2: {r: 0.9433962, g: 0.40410757, b: 0.17354932, a: 0.654902}
-        key3: {r: 0.9483695, g: 0.45646337, b: 0.24616224, a: 0.36078432}
-        key4: {r: 1, g: 0.08363307, b: 0, a: 0.92712426}
-        key5: {r: 0, g: 0, b: 0, a: 0.25882354}
+        key2: {r: 0.9433962, g: 0.40410757, b: 0.17354932, a: 0.92712426}
+        key3: {r: 0.9483695, g: 0.45646337, b: 0.24616224, a: 0.654902}
+        key4: {r: 0.9695368, g: 0.08108534, b: 0, a: 0.36078432}
+        key5: {r: 1, g: 0.08363307, b: 0, a: 0.25882354}
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 3277
         ctime1: 15035
         ctime2: 19468
         ctime3: 23516
-        ctime4: 43947
-        ctime5: 65535
+        ctime4: 27371
+        ctime5: 27563
         ctime6: 65535
         ctime7: 0
         atime0: 0
         atime1: 4433
-        atime2: 29876
-        atime3: 36815
-        atime4: 43176
+        atime2: 26214
+        atime3: 40670
+        atime4: 49344
         atime5: 55319
         atime6: 65535
         atime7: 0
         m_Mode: 0
-        m_NumColorKeys: 6
+        m_NumColorKeys: 7
         m_NumAlphaKeys: 7
       minGradient:
         serializedVersion: 2

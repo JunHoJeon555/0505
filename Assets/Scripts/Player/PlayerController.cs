@@ -85,6 +85,8 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     CharacterController controller;
 
+    //int AttackZHash comtroller;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -98,10 +100,13 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Move.performed += OnMove;
         inputActions.Player.Move.canceled += OnMove;
         inputActions.Player.MoveModeChange.performed += OnMoveModeChange;
+        inputActions.Player.Attack.performed += OnAttack;
     }
+
 
     private void OnDisable()
     {
+        inputActions.Player.Attack.performed -= OnAttack;
         inputActions.Player.MoveModeChange.performed -= OnMoveModeChange;
         inputActions.Player.Move.canceled -= OnMove;
         inputActions.Player.Move.performed -= OnMove;
@@ -174,15 +179,13 @@ public class PlayerController : MonoBehaviour
             Move_Mode = MoveMode.Walk;
             
         }
-        
-      
-        
-        
 
+    }
+    private void OnAttack(InputAction.CallbackContext obj)
+    {
+        //animator.SetTrigger(AttackHash);
     }
 
 
-    //1. 이동방향을 바라보게 만들기
-    //2. 쉬프티 키를 누르면 이동모드가 변경되게 만들기
 
 }
