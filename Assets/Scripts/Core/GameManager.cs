@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-    ItemDataManager iteamDataManager;
+    ItemDataManager itemDataManager;
+    public ItemDataManager ItemData => itemDataManager;
 
-    public ItemDataManager ItemData => iteamDataManager;
- 
+
+    protected override void PreInitialize()
+    {
+        base.PreInitialize();
+        itemDataManager = GetComponent<ItemDataManager>();
+    }
 }

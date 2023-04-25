@@ -39,22 +39,21 @@ public class PlayerController : MonoBehaviour
         get => moveMode;
         set
         {
-           moveMode = value;
-            switch(moveMode)
+            moveMode = value;
+            switch (moveMode)
             {
                 case MoveMode.Walk:
-                    currentSpeed = walkSpeed;               //속도 변경
-                    animator.SetFloat("Speed", 0.3f);
-                    if(inputDir != Vector3.zero)            //이동 중에 변경되었으면
+                    currentSpeed = walkSpeed;               // 속도 변경
+                    if (inputDir != Vector3.zero)          // 이동 중에 변경되었으면
                     {
-                        animator.SetFloat("Speed", 0.3f);   // 애니메이션 파라메터도 변경해서 애니
+                        animator.SetFloat("Speed", 0.3f);   // 애니메이션 파라메터도 변경해서 애니메이션 변경
                     }
                     break;
                 case MoveMode.Run:
                     currentSpeed = runSpeed;
                     if (inputDir != Vector3.zero)
                     {
-                        animator.SetFloat("Speed", 1f);
+                        animator.SetFloat("Speed", 1.0f);
                     }
                     break;
             }
@@ -67,10 +66,10 @@ public class PlayerController : MonoBehaviour
     Vector3 inputDir = Vector3.zero;
 
     /// <summary>
-    /// 회전속도
+    /// 회전 속도
     /// </summary>
-    public float turnSpedd = 10.0f;
-    
+    public float turnSpeed = 10.0f;
+
     /// <summary>
     /// 최종적으로 바라볼 회전
     /// </summary>
@@ -85,7 +84,8 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     CharacterController controller;
 
-    //int AttackZHash comtroller;
+    readonly int AttackHash = Animator.StringToHash("Attack");
+    readonly int SpeedHash = Animator.StringToHash("Speed");
 
     private void Awake()
     {
@@ -103,7 +103,6 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Attack.performed += OnAttack;
     }
 
-
     private void OnDisable()
     {
         inputActions.Player.Attack.performed -= OnAttack;
@@ -118,8 +117,8 @@ public class PlayerController : MonoBehaviour
         controller.Move(Time.deltaTime * currentSpeed * inputDir);  // 좀 더 수동으로 움직이는 느낌
         //controller.SimpleMove(currentSpeed * inputDir);   // 간단하게 움직이기(중력같은 것도 알아서 처리)
 
-        //transform.rotation에서 targetRotation까지 초당 1/turnSpeed씩 회전 
-        transform.rotation = Quaternion.Slerp(transform.rotation,targetRotation,Time.deltaTime *turnSpedd);
+        // transform.rotation에서 targetRotation까지 초당 1/turnSpeed씩 회전
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
     }
 
     private void OnMove(InputAction.CallbackContext context)
@@ -133,59 +132,50 @@ public class PlayerController : MonoBehaviour
         {
             // 이동 입력이 들어왔다.
 
-            //카메라의 y축 회전만 따로 뽑아내기
-            Quaternion cameraYRotation = Quaternion.Euler(0,Camera.main.transform.rotation.eulerAngles.y,0);
-            inputDir = cameraYRotation * inputDir;     //카메라 y 회전을 입력방향에 곱해서 같이 회전시키기
-            
-            targetRotation = Quaternion.LookRotation(inputDir); //회전 된 inputDir 기준으로 최종회전 만들기
+            // 카메라의 Y축 회전만 따로 뽑아내기
+            Quaternion cameraYRotation = Quaternion.Euler(0, Camera.main.transform.rotation.eulerAngles.y, 0);
+            inputDir = cameraYRotation * inputDir;  // 카메라 Y 회전을 입력방향에 곱해서 같이 회전 시키기
 
+            targetRotation = Quaternion.LookRotation(inputDir); // 회전 된 inputDir 기준으로 최종 회전 만들기
 
-            animator.SetFloat("Speed", 1.0f);
-
-            switch (Move_Mode)  //Move_Mode에 ㄸ
+            switch (Move_Mode)  // MoveMode에 따라 애니메이션 변경
             {
                 case MoveMode.Walk:
-                    animator.SetFloat("Speed" ,0.3f);
+                    animator.SetFloat(SpeedHash, 0.3f);
                     break;
                 case MoveMode.Run:
-                    animator.SetFloat("Speed", 1f);
+                    animator.SetFloat(SpeedHash, 1.0f);
                     break;
                 default:
-                    animator.SetFloat("Speed", 0f);
+                    animator.SetFloat(SpeedHash, 0.0f);
                     break;
-
             }
-            inputDir.y = -2;
 
+            inputDir.y = -2.0f; // 강제로 바닥으로 내리기
         }
         else
         {
             // 이동 입력이 끝났다.
-            animator.SetFloat("Speed", 0.0f);
+            animator.SetFloat(SpeedHash, 0.0f);
         }
-       
-
     }
 
-    private void OnMoveModeChange(InputAction.CallbackContext context)
+    private void OnMoveModeChange(InputAction.CallbackContext _)
     {
-        //Shift가 눌러지면 이동모드 변경
-        if(Move_Mode == MoveMode.Walk)
+        // Shift가 눌러지면 이동 모드 변경하기
+        if (Move_Mode == MoveMode.Walk)
         {
             Move_Mode = MoveMode.Run;
         }
         else
         {
             Move_Mode = MoveMode.Walk;
-            
         }
-
     }
-    private void OnAttack(InputAction.CallbackContext obj)
+
+    private void OnAttack(InputAction.CallbackContext _)
     {
-        //animator.SetTrigger(AttackHash);
+        animator.SetTrigger(AttackHash);
     }
-
-
 
 }

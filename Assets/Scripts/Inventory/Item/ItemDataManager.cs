@@ -1,13 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-
-#if UNITY_EDITOR
 using UnityEngine;
 
-//ItemData용 커스텀 애디터라는 의, 두벝ㄴ째 퍼러매토거 true면 저삭또 같이 적용받는다
-[CustomEditor(typeof(ItemData),true)]
-public class ItemDataManager : Editor
-{   
-
+public enum ItemCode
+{
+    Ruby =0,
+    Emerald,
+    Sapphire
 }
-#endif
+
+public class ItemDataManager : MonoBehaviour
+{
+    public ItemData[] itemDatas = null;
+
+    public ItemData this[uint id] => itemDatas[id];
+
+    public ItemData this[ItemCode code] => itemDatas[(int)code];
+
+    public int length => itemDatas.Length;
+}
