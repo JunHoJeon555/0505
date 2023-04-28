@@ -63,8 +63,6 @@ public class Inventory
         dataManager = GameManager.Inst.ItemData;// 데이터 메니저 캐싱해놓기
     }
 
-    //인벤토리에 아이템 추가하기, 특정 슬롯에 추가하기
-
     /// <summary>
     /// 아이템을 1개 추가하는 함수
     /// </summary>
@@ -111,11 +109,11 @@ public class Inventory
     }
 
     /// <summary>
-    /// 아이템을 인벤토리의 특정 슬롯에 개 추가하는 함수
+    /// 아이템을 인벤토리의 특정 슬롯에 1개 추가하는 함수
     /// </summary>
-    /// <param name="data"></param>
-    /// <param name="index"></param>
-    /// <returns></returns>
+    /// <param name="data">추가할 아이템 데이터</param>
+    /// <param name="index">아이템이 추가될 인덱스</param>
+    /// <returns>true면 성공, false면 실패</returns>
     public bool AddItem(ItemData data, uint index)
     {
         bool result = false;
@@ -151,12 +149,16 @@ public class Inventory
         return result;
     }
 
+    /// <summary>
+    /// 아이템을 인벤토리의 특정 슬롯에 1개 추가하는 함수
+    /// </summary>
+    /// <param name="code">추가할 아이템 enum코드</param>
+    /// <param name="index">아이템이 추가될 인덱스</param>
+    /// <returns>true면 성공, false면 실패</returns>
     public bool AddItem(ItemCode code, uint index)
     {
         return AddItem(dataManager[code], index);
     }
-
-
 
     /// <summary>
     /// 인벤토리 특정 슬롯에서 일정 갯수만큼 아이템 제거하는 함수
@@ -165,16 +167,22 @@ public class Inventory
     /// <param name="decreaseCount">감소시킬 갯수</param>
     public void RemoveItem(uint slotIndex, uint decreaseCount = 1)
     {
-        if(IsValidIndex(slotIndex))
+        if (IsValidIndex(slotIndex))
         {
             ItemSlot slot = slots[slotIndex];
             slot.DecreaseSlotItem(decreaseCount);
         }
+        else
+        {
+            Debug.Log($"실패 : {slotIndex}는 잘못된 인덱스입니다.");
+        }
     }
+
 
     /// <summary>
     /// 특정 슬롯에서 아이템을 완전히 제거하는 함수
     /// </summary>
+    /// <param name="slotIndex">제거할 슬롯 인덱스</param>
     public void ClearSlot(uint slotIndex)
     {
         if (IsValidIndex(slotIndex))
@@ -182,34 +190,159 @@ public class Inventory
             ItemSlot slot = slots[slotIndex];
             slot.ClearSlotItem();
         }
+        else
+        {
+            Debug.Log($"실패 : {slotIndex}는 잘못된 인덱스입니다.");
+        }
     }
 
-    //인벤토리를 전부 비우기
     /// <summary>
     /// 인벤토리를 전부 비우는 함수
     /// </summary>
     public void ClearInventory()
     {
-        foreach(var slot in slots)
+        foreach (var slot in slots)
         {
             slot.ClearSlotItem();
         }
-        
     }
 
-    //아이템 이동 시키기 
+    /// <summary>
+    /// 아이템을 이동 시키는 함수
+    /// </summary>
+    /// <param name="from">시작 슬롯의 인덱스</param>
+    /// <param name="to">도착 슬롯의 인덱스</param>
     public void MoveItem(uint from, uint to)
     {
-        //발생할 수 있는 경우의 수
+        // from과 to가 같은 경우는 스킵
+        // from과 to 모두 valid해야 한다.
+        if ((from != to) && IsValidIndex(from) && IsValidIndex(to))
+        {
+            // temp슬롯을 감안해서 삼항연산자로 슬롯 구하기.
+            ItemSlot fromSlot = (from == TempSlotIndex) ? TempSlot : slots[from];
+            if (!fromSlot.IsEmpty) // from이 빈 경우는 처리 안함(실질적으로 사용안함)
+            {
+                ItemSlot toSlot = (to == TempSlotIndex) ? TempSlot : slots[to];
+
+                if (fromSlot.ItemData == toSlot.ItemData)
+                {
+                    // from과 to가 같은 아이템인 경우. 아이템 합치기
+                    toSlot.IncreaseSlotItem(out uint overCount, fromSlot.ItemCount);
+                    fromSlot.DecreaseSlotItem(fromSlot.ItemCount - overCount);
+                    Debug.Log($"인벤토리의 {from}슬롯에서 {to}슬롯으로 아이템 합치기 성공");
+                }
+                else
+                {
+                    // from과 to가 다른 아이템인 경우. 서로 스왑하기
+                    ItemData tempData = fromSlot.ItemData;
+                    uint tempCount = fromSlot.ItemCount;
+                    fromSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount);
+                    toSlot.AssignSlotItem(tempData, tempCount);
+                    Debug.Log($"인벤토리의 {from}슬롯과 {to}슬롯의 아이템 교체 성공");
+                }
+            }
+        }
     }
 
     //아이템 정렬
-    void SlotSorting()
+    public void SlotSorting(ItemSortBy sortBy, bool isAscending = true)
     {
+        // 정렬할 리스트 만들기
+        List<ItemSlot> sortSlots = new List<ItemSlot>(SlotCount);
+        foreach (var slot in slots)
+        {
+            sortSlots.Add(slot);
+        }
 
+        // 파라메터에서 설정한 기준에 따라 정렬
+        switch (sortBy)
+        {
+            case ItemSortBy.Name:
+                sortSlots.Sort((x, y) =>
+                {
+                    if (x.ItemData == null)
+                    {
+                        return 1;       //x가 null이면 x가 크다
+                    }
+                    if (y.ItemData == null)
+                    {
+                        return -1;      //y가 null이면 y가 크다
+                    }
+                    if (isAscending)
+                    {
+                        return x.ItemData.itemName.CompareTo(y.ItemData.itemName);  //디포릍로 오름차순
+                    }
+                    else 
+                    {
+                        return y.ItemData.itemName.CompareTo(x.ItemData.itemName);  //내림차순으로 정렬
+                    }
+                });
+                break;
+            case ItemSortBy.Price:
+                sortSlots.Sort((x, y) =>
+                {
+                    if (x.ItemData == null)
+                    {
+                        return 1;
+                    }
+                    if (y.ItemData == null)
+                    {
+                        return -1;
+                    }
+                    if (isAscending)
+                    {
+                        return x.ItemData.itemName.CompareTo(y.ItemData.price);
+                    }
+                    else
+                    {
+                        return y.ItemData.itemName.CompareTo(x.ItemData.price);
+                    }
+                });
+                break;
+            case ItemSortBy.ID:
+            default:
+                sortSlots.Sort((x, y) =>
+                {
+                    if (x.ItemData == null)
+                    {
+                        return 1;
+                    }
+                    if (y.ItemData == null)
+                    {
+                        return -1;
+                    }
+                    if (isAscending)
+                    {
+                        return x.ItemData.itemName.CompareTo(y.ItemData.id);
+                    }
+                    else
+                    {
+                        return y.ItemData.itemName.CompareTo(x.ItemData.id);
+                    }
+                });
+                break;
+        }
+
+
+        // 정렬된 결과에 따라 슬롯 순서 조절하기
+        List<(ItemData, uint)> sortedData = new List<(ItemData, uint)>(SlotCount);
+        foreach (var slot in sortSlots)
+        {
+            //아이템 데이터와 아이템 갯수를 정렬순서에 맞춰서 리스트에 저장하기
+            sortedData.Add((slot.ItemData, slot.ItemCount));        
+        }
+
+        int index = 0;
+        foreach (var data in sortedData)
+        {
+            //저장해 놓은 데이터에 따라 슬롯에 아이템 설정 
+            slots[index].AssignSlotItem(data.Item1, data.Item2);
+            index++;
+        }
     }
 
-    // 단순 확인 및 탐색용 함수들 -----------------------------------------------------------------------------------------------------------------
+    // 단순 확인 및 탐색용 함수들 -------------------------------------------------------------------
+
     private bool IsValidIndex(uint index) => (index < SlotCount) || (index == TempSlotIndex);
 
     /// <summary>
@@ -258,7 +391,6 @@ public class Inventory
         // 출력 예시 : [ 루비(1), 사파이어(1), 에메랄드(2), (빈칸), (빈칸), (빈칸) ]
         string printText = "[ ";
 
-
         for (int i = 0; i < SlotCount - 1; i++)
         {
             if (!slots[i].IsEmpty)
@@ -271,6 +403,7 @@ public class Inventory
             }
             printText += ", ";
         }
+
         ItemSlot last = slots[SlotCount - 1];
         if (!last.IsEmpty)
         {

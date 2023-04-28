@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Build;
@@ -24,9 +25,11 @@ public class ItemSlot
             if(slotItemData != value)   //아이템 종류가 변경되었을 때만  대입
             {
                 slotItemData= value;
+                onSlotItemChange?.Invoke();
             }
         }
     }
+    public Action onSlotItemChange;
 
     /// <summary>
     /// 슬롯이 비었는지 확인한느 프로퍼티. true면 비어있고 false면 아이템이 들어있다.
@@ -45,6 +48,7 @@ public class ItemSlot
             if(itemCount != value)
             {
                 itemCount= value;
+                onSlotItemChange?.Invoke();
             }
         }
     }
@@ -147,6 +151,4 @@ public class ItemSlot
             Debug.Log($"인벤토리 {slotIndex}\"{ItemData.itemName}\"아이템이{decreaseCount}개 감소 현재{ItemCount}개.");
         }
     }
-
-
 }
