@@ -4,277 +4,306 @@ using UnityEngine;
 
 public class Inventory
 {
-    // ÇÊ¿ä »ó¼ö -----------------------------------------------------------------------------------
+    // í•„ìš” ìƒìˆ˜ -----------------------------------------------------------------------------------
 
     /// <summary>
-    /// ±âº» ÀÎº¥Åä¸® Å©±â
+    /// ê¸°ë³¸ ì¸ë²¤í† ë¦¬ í¬ê¸°
     /// </summary>
     public const int Default_Inventory_Size = 6;
 
     /// <summary>
-    /// ÀÓ½Ã ½½·ÔÀÇ ÀÎµ¦½º
+    /// ì„ì‹œ ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤
     /// </summary>
     public const uint TempSlotIndex = 99999999;
 
-    // º¯¼ö ---------------------------------------------------------------------------------------
+    // ë³€ìˆ˜ ---------------------------------------------------------------------------------------
 
     /// <summary>
-    /// ÀÌ ÀÎº¥Åä¸®¿¡ µé¾îÀÖ´Â ½½·ÔÀÇ ¹è¿­
+    /// ì´ ì¸ë²¤í† ë¦¬ì— ë“¤ì–´ìˆëŠ” ìŠ¬ë¡¯ì˜ ë°°ì—´
     /// </summary>
     ItemSlot[] slots;
 
     /// <summary>
-    /// ÀÎº¥Åä¸® ½½·Ô¿¡ Á¢±ÙÇÏ±â À§ÇÑ ÀÎµ¦¼­
+    /// ì¸ë²¤í† ë¦¬ ìŠ¬ë¡¯ì— ì ‘ê·¼í•˜ê¸° ìœ„í•œ ì¸ë±ì„œ
     /// </summary>
-    /// <param name="index">Á¢±ÙÇÒ ½½·ÔÀÇ ÀÎµ¦½º</param>
-    /// <returns>Á¢±ÙÇÒ ½½·Ô</returns>
+    /// <param name="index">ì ‘ê·¼í•  ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤</param>
+    /// <returns>ì ‘ê·¼í•  ìŠ¬ë¡¯</returns>
     public ItemSlot this[uint index] => slots[index];
 
     /// <summary>
-    /// ÀÎº¥Åä¸® ½½·ÔÀÇ °¹¼ö
+    /// ì¸ë²¤í† ë¦¬ ìŠ¬ë¡¯ì˜ ê°¯ìˆ˜
     /// </summary>
     public int SlotCount => slots.Length;
 
     /// <summary>
-    /// ÀÓ½Ã ½½·Ô(µå·¡±×³ª ºĞ¸®ÇÒ ¶§ »ç¿ë)
+    /// ì„ì‹œ ìŠ¬ë¡¯(ë“œë˜ê·¸ë‚˜ ë¶„ë¦¬í•  ë•Œ ì‚¬ìš©)
     /// </summary>
     ItemSlot tempSlot;
     public ItemSlot TempSlot => tempSlot;
 
     /// <summary>
-    /// °ÔÀÓ ¸Ş´ÏÀú°¡ °¡Áö°í ÀÖ´Â ¾ÆÀÌÅÛ µ¥ÀÌÅÍ ¸Ş´ÏÀú(¸ğµç ¾ÆÀÌÅÛÀÇ µ¥ÀÌÅÍ¸¦ °¡Áö°í ÀÖ´Ù.(Á¾·ùº°))
+    /// ê²Œì„ ë©”ë‹ˆì €ê°€ ê°€ì§€ê³  ìˆëŠ” ì•„ì´í…œ ë°ì´í„° ë©”ë‹ˆì €(ëª¨ë“  ì•„ì´í…œì˜ ë°ì´í„°ë¥¼ ê°€ì§€ê³  ìˆë‹¤.(ì¢…ë¥˜ë³„))
     /// </summary>
     ItemDataManager dataManager;
 
     /// <summary>
-    /// »ı¼ºÀÚ
+    /// ì´ ì¸ë²¤í† ë¦¬ë¥¼ ê°€ì§€ê³  ìˆëŠ” í”Œë ˆì´ì–´
     /// </summary>
-    /// <param name="size">»õ·Î ¸¸µé ÀÎº¥Åä¸®ÀÇ Å©±â</param>
-    public Inventory(uint size = Default_Inventory_Size)
-    {
-        Debug.Log($"{size}Ä­Â¥¸® ÀÎº¥Åä¸® »ı¼º");
-        slots = new ItemSlot[size];             // ½½·Ô¿ë ¹è¿­ ¸¸µé±â
-        for (uint i = 0; i < size; i++)
-        {
-            slots[i] = new ItemSlot(i);         // ½½·Ô ÇÏ³ª¾¿ »ı¼º
-        }
-        tempSlot = new ItemSlot(TempSlotIndex); // ÀÓ½Ã ½½·Ô ¸¸µé°í
+    Player owner;
+    public Player Owner => owner;
+    
 
-        dataManager = GameManager.Inst.ItemData;// µ¥ÀÌÅÍ ¸Ş´ÏÀú Ä³½ÌÇØ³õ±â
+    /// <summary>
+    /// ìƒì„±ì
+    /// </summary>
+    /// <param name="size">ìƒˆë¡œ ë§Œë“¤ ì¸ë²¤í† ë¦¬ì˜ í¬ê¸°</param>
+    public Inventory(Player owner, uint size = Default_Inventory_Size)
+    {
+        Debug.Log($"{size}ì¹¸ì§œë¦¬ ì¸ë²¤í† ë¦¬ ìƒì„±");
+        slots = new ItemSlot[size];             // ìŠ¬ë¡¯ìš© ë°°ì—´ ë§Œë“¤ê¸°
+        for(uint i=0;i<size; i++)
+        {
+            slots[i] = new ItemSlot(i);         // ìŠ¬ë¡¯ í•˜ë‚˜ì”© ìƒì„±
+        }
+        tempSlot = new ItemSlot(TempSlotIndex); // ì„ì‹œ ìŠ¬ë¡¯ ë§Œë“¤ê³ 
+
+        dataManager = GameManager.Inst.ItemData;// ë°ì´í„° ë©”ë‹ˆì € ìºì‹±í•´ë†“ê¸°
+
+        this.owner = owner;
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» 1°³ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    /// ì•„ì´í…œì„ 1ê°œ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="data">Ãß°¡µÉ ¾ÆÀÌÅÛÀÇ µ¥ÀÌÅÍ</param>
-    /// <returns>¼º°ø¿©ºÎ(true¸é Ãß°¡, false Ãß°¡½ÇÆĞ)</returns>
+    /// <param name="data">ì¶”ê°€ë  ì•„ì´í…œì˜ ë°ì´í„°</param>
+    /// <returns>ì„±ê³µì—¬ë¶€(trueë©´ ì¶”ê°€, false ì¶”ê°€ì‹¤íŒ¨)</returns>
     public bool AddItem(ItemData data)
     {
         bool result = false;
 
-        // °°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛÀÌ ÀÖ´ÂÁö
+        // ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œì´ ìˆëŠ”ì§€
         ItemSlot sameDataSlot = FindSameItem(data);
-        if (sameDataSlot != null)
+        if(sameDataSlot != null)
         {
-            // °°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛÀÌ ÀÖÀ¸¸é Áõ°¡ ½Ãµµ
-            result = sameDataSlot.IncreaseSlotItem(out uint _); // ³ÑÄ¡´Â °¹¼ö´Â ÀÇ¹Ì¾øÀ½. °á°ú¸¸ »ç¿ë
+            // ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œì´ ìˆìœ¼ë©´ ì¦ê°€ ì‹œë„
+            result = sameDataSlot.IncreaseSlotItem(out uint _); // ë„˜ì¹˜ëŠ” ê°¯ìˆ˜ëŠ” ì˜ë¯¸ì—†ìŒ. ê²°ê³¼ë§Œ ì‚¬ìš©
         }
         else
         {
-            // °°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛÀÌ ¾øÀ¸¸é ºó½½·Ô Ã£±â
+            // ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œì´ ì—†ìœ¼ë©´ ë¹ˆìŠ¬ë¡¯ ì°¾ê¸°
             ItemSlot emptySlot = FindEmptySlot();
             if (emptySlot != null)
             {
-                // ºó½½·Ô Ã£¾Ò´Ù.
+                // ë¹ˆìŠ¬ë¡¯ ì°¾ì•˜ë‹¤.
                 emptySlot.AssignSlotItem(data);
                 result = true;
             }
             else
             {
-                // ºñ¾îÀÖ´Â ½½·ÔÀÌ ¾ø´Ù.
-                Debug.Log("½ÇÆĞ : ÀÎº¥Åä¸®°¡ °¡µæ Ã¡½À´Ï´Ù.");
+                // ë¹„ì–´ìˆëŠ” ìŠ¬ë¡¯ì´ ì—†ë‹¤.
+                Debug.Log("ì‹¤íŒ¨ : ì¸ë²¤í† ë¦¬ê°€ ê°€ë“ ì°¼ìŠµë‹ˆë‹¤.");
             }
         }
         return result;
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» 1°³ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    /// ì•„ì´í…œì„ 1ê°œ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="code">Ãß°¡µÉ ¾ÆÀÌÅÛÀÇ enum</param>
-    /// <returns>¼º°ø¿©ºÎ(true¸é Ãß°¡, false Ãß°¡½ÇÆĞ)</returns>
+    /// <param name="code">ì¶”ê°€ë  ì•„ì´í…œì˜ enum</param>
+    /// <returns>ì„±ê³µì—¬ë¶€(trueë©´ ì¶”ê°€, false ì¶”ê°€ì‹¤íŒ¨)</returns>
     public bool AddItem(ItemCode code)
     {
         return AddItem(dataManager[code]);
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ÀÎº¥Åä¸®ÀÇ Æ¯Á¤ ½½·Ô¿¡ 1°³ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    /// ì•„ì´í…œì„ ì¸ë²¤í† ë¦¬ì˜ íŠ¹ì • ìŠ¬ë¡¯ì— 1ê°œ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="data">Ãß°¡ÇÒ ¾ÆÀÌÅÛ µ¥ÀÌÅÍ</param>
-    /// <param name="index">¾ÆÀÌÅÛÀÌ Ãß°¡µÉ ÀÎµ¦½º</param>
-    /// <returns>true¸é ¼º°ø, false¸é ½ÇÆĞ</returns>
+    /// <param name="data">ì¶”ê°€í•  ì•„ì´í…œ ë°ì´í„°</param>
+    /// <param name="index">ì•„ì´í…œì´ ì¶”ê°€ë  ì¸ë±ìŠ¤</param>
+    /// <returns>trueë©´ ì„±ê³µ, falseë©´ ì‹¤íŒ¨</returns>
     public bool AddItem(ItemData data, uint index)
     {
         bool result = false;
-
-        if (IsValidIndex(index)) // ÀûÀıÇÑ ÀÎµ¦½ºÀÎÁö È®ÀÎ
+                
+        if(IsValidIndex(index)) // ì ì ˆí•œ ì¸ë±ìŠ¤ì¸ì§€ í™•ì¸
         {
-            ItemSlot slot = slots[index];  // index¿¡ ÇØ´çÇÏ´Â ½½·Ô Ã£¾Æ¿À±â
+            ItemSlot slot = slots[index];  // indexì— í•´ë‹¹í•˜ëŠ” ìŠ¬ë¡¯ ì°¾ì•„ì˜¤ê¸°
 
             if (slot.IsEmpty)
             {
-                // ½½·ÔÀÌ ºñ¾îÀÖÀ¸¸é ±×³É Ãß°¡
+                // ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆìœ¼ë©´ ê·¸ëƒ¥ ì¶”ê°€
                 slot.AssignSlotItem(data);
             }
             else
             {
-                // ½½·ÔÀÌ ºñ¾îÀÖÁö ¾Ê´Ù.
+                // ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆì§€ ì•Šë‹¤.
                 if (slot.ItemData == data)
                 {
-                    result = slot.IncreaseSlotItem(out uint _); // °°Àº ¾ÆÀÌÅÛÀÌ¸é Áõ°¡ ½Ãµµ
+                    result = slot.IncreaseSlotItem(out uint _); // ê°™ì€ ì•„ì´í…œì´ë©´ ì¦ê°€ ì‹œë„
                 }
                 else
                 {
-                    // ´Ù¸¥ ¾ÆÀÌÅÛÀÌ¸é ±×³É ½ÇÆĞ
-                    Debug.Log($"½ÇÆĞ : ÀÎº¥Åä¸® {index}¹ø ½½·Ô¿¡ ´Ù¸¥ ¾ÆÀÌÅÛÀÌ µé¾îÀÖ½À´Ï´Ù.");
+                    // ë‹¤ë¥¸ ì•„ì´í…œì´ë©´ ê·¸ëƒ¥ ì‹¤íŒ¨
+                    Debug.Log($"ì‹¤íŒ¨ : ì¸ë²¤í† ë¦¬ {index}ë²ˆ ìŠ¬ë¡¯ì— ë‹¤ë¥¸ ì•„ì´í…œì´ ë“¤ì–´ìˆìŠµë‹ˆë‹¤.");
                 }
             }
         }
         else
         {
-            Debug.Log($"½ÇÆĞ : {index}¹øÀº Àß¸øµÈ ÀÎµ¦½ºÀÔ´Ï´Ù.");
+            Debug.Log($"ì‹¤íŒ¨ : {index}ë²ˆì€ ì˜ëª»ëœ ì¸ë±ìŠ¤ì…ë‹ˆë‹¤.");
         }
 
         return result;
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ÀÎº¥Åä¸®ÀÇ Æ¯Á¤ ½½·Ô¿¡ 1°³ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    /// ì•„ì´í…œì„ ì¸ë²¤í† ë¦¬ì˜ íŠ¹ì • ìŠ¬ë¡¯ì— 1ê°œ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="code">Ãß°¡ÇÒ ¾ÆÀÌÅÛ enumÄÚµå</param>
-    /// <param name="index">¾ÆÀÌÅÛÀÌ Ãß°¡µÉ ÀÎµ¦½º</param>
-    /// <returns>true¸é ¼º°ø, false¸é ½ÇÆĞ</returns>
+    /// <param name="code">ì¶”ê°€í•  ì•„ì´í…œ enumì½”ë“œ</param>
+    /// <param name="index">ì•„ì´í…œì´ ì¶”ê°€ë  ì¸ë±ìŠ¤</param>
+    /// <returns>trueë©´ ì„±ê³µ, falseë©´ ì‹¤íŒ¨</returns>
     public bool AddItem(ItemCode code, uint index)
     {
         return AddItem(dataManager[code], index);
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸® Æ¯Á¤ ½½·Ô¿¡¼­ ÀÏÁ¤ °¹¼ö¸¸Å­ ¾ÆÀÌÅÛ Á¦°ÅÇÏ´Â ÇÔ¼ö
+    /// ì¸ë²¤í† ë¦¬ íŠ¹ì • ìŠ¬ë¡¯ì—ì„œ ì¼ì • ê°¯ìˆ˜ë§Œí¼ ì•„ì´í…œ ì œê±°í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="slotIndex">Á¦°ÅÇÒ ½½·Ô ÀÎµ¦½º</param>
-    /// <param name="decreaseCount">°¨¼Ò½ÃÅ³ °¹¼ö</param>
+    /// <param name="slotIndex">ì œê±°í•  ìŠ¬ë¡¯ ì¸ë±ìŠ¤</param>
+    /// <param name="decreaseCount">ê°ì†Œì‹œí‚¬ ê°¯ìˆ˜</param>
     public void RemoveItem(uint slotIndex, uint decreaseCount = 1)
     {
-        if (IsValidIndex(slotIndex))
+        if(IsValidIndex(slotIndex))
         {
             ItemSlot slot = slots[slotIndex];
             slot.DecreaseSlotItem(decreaseCount);
         }
         else
         {
-            Debug.Log($"½ÇÆĞ : {slotIndex}´Â Àß¸øµÈ ÀÎµ¦½ºÀÔ´Ï´Ù.");
+            Debug.Log($"ì‹¤íŒ¨ : {slotIndex}ëŠ” ì˜ëª»ëœ ì¸ë±ìŠ¤ì…ë‹ˆë‹¤.");
         }
     }
-
-
+    
+    
     /// <summary>
-    /// Æ¯Á¤ ½½·Ô¿¡¼­ ¾ÆÀÌÅÛÀ» ¿ÏÀüÈ÷ Á¦°ÅÇÏ´Â ÇÔ¼ö
+    /// íŠ¹ì • ìŠ¬ë¡¯ì—ì„œ ì•„ì´í…œì„ ì™„ì „íˆ ì œê±°í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="slotIndex">Á¦°ÅÇÒ ½½·Ô ÀÎµ¦½º</param>
+    /// <param name="slotIndex">ì œê±°í•  ìŠ¬ë¡¯ ì¸ë±ìŠ¤</param>
     public void ClearSlot(uint slotIndex)
     {
-        if (IsValidIndex(slotIndex))
+        if(IsValidIndex(slotIndex))
         {
             ItemSlot slot = slots[slotIndex];
             slot.ClearSlotItem();
         }
         else
         {
-            Debug.Log($"½ÇÆĞ : {slotIndex}´Â Àß¸øµÈ ÀÎµ¦½ºÀÔ´Ï´Ù.");
+            Debug.Log($"ì‹¤íŒ¨ : {slotIndex}ëŠ” ì˜ëª»ëœ ì¸ë±ìŠ¤ì…ë‹ˆë‹¤.");
         }
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¸¦ ÀüºÎ ºñ¿ì´Â ÇÔ¼ö
+    /// ì¸ë²¤í† ë¦¬ë¥¼ ì „ë¶€ ë¹„ìš°ëŠ” í•¨ìˆ˜
     /// </summary>
     public void ClearInventory()
     {
-        foreach (var slot in slots)
+        foreach(var slot in slots)
         {
             slot.ClearSlotItem();
         }
     }
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ÀÌµ¿ ½ÃÅ°´Â ÇÔ¼ö
+    /// ì•„ì´í…œì„ ì´ë™ ì‹œí‚¤ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="from">½ÃÀÛ ½½·ÔÀÇ ÀÎµ¦½º</param>
-    /// <param name="to">µµÂø ½½·ÔÀÇ ÀÎµ¦½º</param>
+    /// <param name="from">ì‹œì‘ ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤</param>
+    /// <param name="to">ë„ì°© ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤</param>
     public void MoveItem(uint from, uint to)
     {
-        // from°ú to°¡ °°Àº °æ¿ì´Â ½ºÅµ
-        // from°ú to ¸ğµÎ validÇØ¾ß ÇÑ´Ù.
-        if ((from != to) && IsValidIndex(from) && IsValidIndex(to))
+        // fromê³¼ toê°€ ê°™ì€ ê²½ìš°ëŠ” ìŠ¤í‚µ
+        // fromê³¼ to ëª¨ë‘ validí•´ì•¼ í•œë‹¤.
+        if ( (from != to) &&  IsValidIndex(from) && IsValidIndex(to) )    
         {
-            // temp½½·ÔÀ» °¨¾ÈÇØ¼­ »ïÇ×¿¬»êÀÚ·Î ½½·Ô ±¸ÇÏ±â.
+            // tempìŠ¬ë¡¯ì„ ê°ì•ˆí•´ì„œ ì‚¼í•­ì—°ì‚°ìë¡œ ìŠ¬ë¡¯ êµ¬í•˜ê¸°.
             ItemSlot fromSlot = (from == TempSlotIndex) ? TempSlot : slots[from];
-            if (!fromSlot.IsEmpty) // fromÀÌ ºó °æ¿ì´Â Ã³¸® ¾ÈÇÔ(½ÇÁúÀûÀ¸·Î »ç¿ë¾ÈÇÔ)
+            if( !fromSlot.IsEmpty ) // fromì´ ë¹ˆ ê²½ìš°ëŠ” ì²˜ë¦¬ ì•ˆí•¨(ì‹¤ì§ˆì ìœ¼ë¡œ ì‚¬ìš©ì•ˆí•¨)
             {
                 ItemSlot toSlot = (to == TempSlotIndex) ? TempSlot : slots[to];
 
-                if (fromSlot.ItemData == toSlot.ItemData)
+                if( fromSlot.ItemData == toSlot.ItemData )  
                 {
-                    // from°ú to°¡ °°Àº ¾ÆÀÌÅÛÀÎ °æ¿ì. ¾ÆÀÌÅÛ ÇÕÄ¡±â
-                    toSlot.IncreaseSlotItem(out uint overCount, fromSlot.ItemCount);
+                    // fromê³¼ toê°€ ê°™ì€ ì•„ì´í…œì¸ ê²½ìš°. ì•„ì´í…œ í•©ì¹˜ê¸°
+                    toSlot.IncreaseSlotItem(out uint overCount, fromSlot.ItemCount );
                     fromSlot.DecreaseSlotItem(fromSlot.ItemCount - overCount);
-                    Debug.Log($"ÀÎº¥Åä¸®ÀÇ {from}½½·Ô¿¡¼­ {to}½½·ÔÀ¸·Î ¾ÆÀÌÅÛ ÇÕÄ¡±â ¼º°ø");
+                    Debug.Log($"ì¸ë²¤í† ë¦¬ì˜ {from}ìŠ¬ë¡¯ì—ì„œ {to}ìŠ¬ë¡¯ìœ¼ë¡œ ì•„ì´í…œ í•©ì¹˜ê¸° ì„±ê³µ");
                 }
                 else
                 {
-                    // from°ú to°¡ ´Ù¸¥ ¾ÆÀÌÅÛÀÎ °æ¿ì. ¼­·Î ½º¿ÒÇÏ±â
+                    // fromê³¼ toê°€ ë‹¤ë¥¸ ì•„ì´í…œì¸ ê²½ìš°. ì„œë¡œ ìŠ¤ì™‘í•˜ê¸°
                     ItemData tempData = fromSlot.ItemData;
                     uint tempCount = fromSlot.ItemCount;
                     fromSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount);
                     toSlot.AssignSlotItem(tempData, tempCount);
-                    Debug.Log($"ÀÎº¥Åä¸®ÀÇ {from}½½·Ô°ú {to}½½·ÔÀÇ ¾ÆÀÌÅÛ ±³Ã¼ ¼º°ø");
+                    Debug.Log($"ì¸ë²¤í† ë¦¬ì˜ {from}ìŠ¬ë¡¯ê³¼ {to}ìŠ¬ë¡¯ì˜ ì•„ì´í…œ êµì²´ ì„±ê³µ");
                 }
             }
         }
     }
 
-    //¾ÆÀÌÅÛ Á¤·Ä
+    /// <summary>
+    /// íŠ¹ì • ìŠ¬ë¡¯ì—ì„œ ì•„ì´í…œì„ ë¶„ë¦¬í•´ TempìŠ¬ë¡¯ìœ¼ë¡œ ì˜®ê¸°ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="slotID">ë¶„ë¦¬í•  ìŠ¬ë¡¯</param>
+    /// <param name="count">ë¶„ë¦¬í•  ê°¯ìˆ˜</param>
+    public void SplitItem(uint slotID, uint count)
+    {
+        if (IsValidIndex(slotID))
+        {
+            ItemSlot fromSlot = slots[slotID];
+            fromSlot.DecreaseSlotItem(count);
+            TempSlot.AssignSlotItem(fromSlot.ItemData, count);
+        }
+    }
+
+    //ì•„ì´í…œ ì •ë ¬
+    /// <summary>
+    /// ì•„ì´í…œ ì •ë ¬ìš© í•¨ìˆ˜
+    /// </summary>
+    /// <param name="sortBy">ì •ë ¬ ê¸°ì¤€</param>
+    /// <param name="isAscending">trueë©´ ì˜¤ë¦„ì°¨ìˆœ, falseë©´ ë‚´ë¦¼ì°¨ìˆœ</param>
     public void SlotSorting(ItemSortBy sortBy, bool isAscending = true)
     {
-        // Á¤·ÄÇÒ ¸®½ºÆ® ¸¸µé±â
+        // ì •ë ¬í•  ë¦¬ìŠ¤íŠ¸ ë§Œë“¤ê¸°
         List<ItemSlot> sortSlots = new List<ItemSlot>(SlotCount);
-        foreach (var slot in slots)
+        foreach(var slot in slots )
         {
             sortSlots.Add(slot);
         }
 
-        // ÆÄ¶ó¸ŞÅÍ¿¡¼­ ¼³Á¤ÇÑ ±âÁØ¿¡ µû¶ó Á¤·Ä
-        switch (sortBy)
+        // íŒŒë¼ë©”í„°ì—ì„œ ì„¤ì •í•œ ê¸°ì¤€ì— ë”°ë¼ ì •ë ¬
+        switch(sortBy)
         {
             case ItemSortBy.Name:
                 sortSlots.Sort((x, y) =>
                 {
-                    if (x.ItemData == null)
+                    if(x.ItemData == null)  
                     {
-                        return 1;       //x°¡ nullÀÌ¸é x°¡ Å©´Ù
+                        return 1;       // xê°€ nullì´ë©´ xê°€ í¬ë‹¤.
                     }
-                    if (y.ItemData == null)
+                    if(y.ItemData == null)
                     {
-                        return -1;      //y°¡ nullÀÌ¸é y°¡ Å©´Ù
+                        return -1;      // yê°€ nullì´ë©´ yê°€ í¬ë‹¤.
                     }
                     if (isAscending)
                     {
-                        return x.ItemData.itemName.CompareTo(y.ItemData.itemName);  //µğÆ÷¸¬·Î ¿À¸§Â÷¼ø
+                        return x.ItemData.itemName.CompareTo(y.ItemData.itemName);  // ë””í´íŠ¸ë¡œ ì˜¤ë¦„ì°¨ìˆœ
                     }
-                    else 
+                    else
                     {
-                        return y.ItemData.itemName.CompareTo(x.ItemData.itemName);  //³»¸²Â÷¼øÀ¸·Î Á¤·Ä
+                        return y.ItemData.itemName.CompareTo(x.ItemData.itemName);  // ë‚´ë¦¼ì°¨ìˆœìœ¼ë¡œ ì²˜ë¦¬
                     }
                 });
                 break;
@@ -291,15 +320,15 @@ public class Inventory
                     }
                     if (isAscending)
                     {
-                        return x.ItemData.itemName.CompareTo(y.ItemData.price);
+                        return x.ItemData.price.CompareTo(y.ItemData.price);
                     }
                     else
                     {
-                        return y.ItemData.itemName.CompareTo(x.ItemData.price);
+                        return y.ItemData.price.CompareTo(x.ItemData.price);
                     }
                 });
                 break;
-            case ItemSortBy.ID:
+            case ItemSortBy.Code:
             default:
                 sortSlots.Sort((x, y) =>
                 {
@@ -313,48 +342,47 @@ public class Inventory
                     }
                     if (isAscending)
                     {
-                        return x.ItemData.itemName.CompareTo(y.ItemData.id);
+                        return x.ItemData.code.CompareTo(y.ItemData.code);
                     }
                     else
                     {
-                        return y.ItemData.itemName.CompareTo(x.ItemData.id);
+                        return y.ItemData.code.CompareTo(x.ItemData.code);
                     }
                 });
                 break;
         }
 
-
-        // Á¤·ÄµÈ °á°ú¿¡ µû¶ó ½½·Ô ¼ø¼­ Á¶ÀıÇÏ±â
+        // ì •ë ¬ëœ ê²°ê³¼ì— ë”°ë¼ ìŠ¬ë¡¯ ìˆœì„œ ì¡°ì ˆí•˜ê¸°
         List<(ItemData, uint)> sortedData = new List<(ItemData, uint)>(SlotCount);
         foreach (var slot in sortSlots)
         {
-            //¾ÆÀÌÅÛ µ¥ÀÌÅÍ¿Í ¾ÆÀÌÅÛ °¹¼ö¸¦ Á¤·Ä¼ø¼­¿¡ ¸ÂÃç¼­ ¸®½ºÆ®¿¡ ÀúÀåÇÏ±â
-            sortedData.Add((slot.ItemData, slot.ItemCount));        
+            // ì•„ì´í…œ ë°ì´í„°ì™€ ì•„ì´í…œ ê°¯ìˆ˜ë¥¼ ì •ë ¬ ìˆœì„œì— ë§ì¶°ì„œ ë¦¬ìŠ¤íŠ¸ì— ì €ì¥í•˜ê¸°
+            sortedData.Add((slot.ItemData, slot.ItemCount));    
         }
 
         int index = 0;
         foreach (var data in sortedData)
         {
-            //ÀúÀåÇØ ³õÀº µ¥ÀÌÅÍ¿¡ µû¶ó ½½·Ô¿¡ ¾ÆÀÌÅÛ ¼³Á¤ 
+            // ì €ì¥í•´ ë†“ì€ ë°ì´í„°ì— ë”°ë¼ ìŠ¬ë¡¯ì— ì•„ì´í…œ ì„¤ì •
             slots[index].AssignSlotItem(data.Item1, data.Item2);
             index++;
         }
     }
 
-    // ´Ü¼ø È®ÀÎ ¹× Å½»ö¿ë ÇÔ¼öµé -------------------------------------------------------------------
+    // ë‹¨ìˆœ í™•ì¸ ë° íƒìƒ‰ìš© í•¨ìˆ˜ë“¤ -------------------------------------------------------------------
 
-    private bool IsValidIndex(uint index) => (index < SlotCount) || (index == TempSlotIndex);
+    private bool IsValidIndex(uint index) => (index < SlotCount) || (index == TempSlotIndex);    
 
     /// <summary>
-    /// ºñ¾îÀÖ´Â ½½·ÔÀ» Ã£¾ÆÁÖ´Â ÇÔ¼ö
+    /// ë¹„ì–´ìˆëŠ” ìŠ¬ë¡¯ì„ ì°¾ì•„ì£¼ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <returns>nullÀÌ¸é ºñ¾îÀÖ´Â ÇÔ¼ö°¡ ¾ø´Ù. nullÀÌ ¾Æ´Ï¸é Ã£¾Ò´Ù.</returns>
+    /// <returns>nullì´ë©´ ë¹„ì–´ìˆëŠ” í•¨ìˆ˜ê°€ ì—†ë‹¤. nullì´ ì•„ë‹ˆë©´ ì°¾ì•˜ë‹¤.</returns>
     private ItemSlot FindEmptySlot()
     {
         ItemSlot result = null;
-        foreach (ItemSlot slot in slots) // ±×³É ´Ù µÚÁ®º¸±â
+        foreach(ItemSlot slot in slots) // ê·¸ëƒ¥ ë‹¤ ë’¤ì ¸ë³´ê¸°
         {
-            if (slot.IsEmpty)
+            if(slot.IsEmpty)
             {
                 result = slot;
                 break;
@@ -364,17 +392,17 @@ public class Inventory
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸®¿¡ °°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛÀÌ ÀÖ´ÂÁö Ã£¾ÆÁÖ´Â ÇÔ¼ö(ÃÖ´ë°¹¼öÀÎ ½½·ÔÀº Á¦¿Ü)
+    /// ì¸ë²¤í† ë¦¬ì— ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œì´ ìˆëŠ”ì§€ ì°¾ì•„ì£¼ëŠ” í•¨ìˆ˜(ìµœëŒ€ê°¯ìˆ˜ì¸ ìŠ¬ë¡¯ì€ ì œì™¸)
     /// </summary>
-    /// <param name="data">Ã£À» ¾ÆÀÌÅÛ</param>
-    /// <returns>°°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛÀÌ µé¾îÀÖ´Â ½½·Ô(nullÀÌ ¾Æ´Ï¸é Ã£¾Ò´Ù. nullÀÌ¸é ¾ø´Ù.)</returns>
+    /// <param name="data">ì°¾ì„ ì•„ì´í…œ</param>
+    /// <returns>ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œì´ ë“¤ì–´ìˆëŠ” ìŠ¬ë¡¯(nullì´ ì•„ë‹ˆë©´ ì°¾ì•˜ë‹¤. nullì´ë©´ ì—†ë‹¤.)</returns>
     private ItemSlot FindSameItem(ItemData data)
     {
         ItemSlot findSlot = null;
-        foreach (ItemSlot slot in slots)    // ÀüºÎ Ã£±â
+        foreach (ItemSlot slot in slots)    // ì „ë¶€ ì°¾ê¸°
         {
-            // °°Àº Á¾·ùÀÇ ¾ÆÀÌÅÛ µ¥ÀÌÅÍ°í ½½·Ô¿¡ ºó¿ë·®ÀÌ ÀÖ¾î¾ß ÇÑ´Ù.
-            if (slot.ItemData == data && slot.ItemCount < slot.ItemData.maxStackCount)
+            // ê°™ì€ ì¢…ë¥˜ì˜ ì•„ì´í…œ ë°ì´í„°ê³  ìŠ¬ë¡¯ì— ë¹ˆìš©ëŸ‰ì´ ìˆì–´ì•¼ í•œë‹¤.
+            if(slot.ItemData == data && slot.ItemCount < slot.ItemData.maxStackCount)
             {
                 findSlot = slot;
                 break;
@@ -384,14 +412,14 @@ public class Inventory
     }
 
     /// <summary>
-    /// Å×½ºÆ® È®ÀÎ¿ë ÇÔ¼ö
+    /// í…ŒìŠ¤íŠ¸ í™•ì¸ìš© í•¨ìˆ˜
     /// </summary>
     public void PrintInventory()
     {
-        // Ãâ·Â ¿¹½Ã : [ ·çºñ(1), »çÆÄÀÌ¾î(1), ¿¡¸Ş¶öµå(2), (ºóÄ­), (ºóÄ­), (ºóÄ­) ]
+        // ì¶œë ¥ ì˜ˆì‹œ : [ ë£¨ë¹„(1), ì‚¬íŒŒì´ì–´(1), ì—ë©”ë„ë“œ(2), (ë¹ˆì¹¸), (ë¹ˆì¹¸), (ë¹ˆì¹¸) ]
         string printText = "[ ";
 
-        for (int i = 0; i < SlotCount - 1; i++)
+        for(int i =0;i<SlotCount-1;i++)
         {
             if (!slots[i].IsEmpty)
             {
@@ -399,19 +427,19 @@ public class Inventory
             }
             else
             {
-                printText += "(ºóÄ­)";
+                printText += "(ë¹ˆì¹¸)";
             }
             printText += ", ";
         }
 
         ItemSlot last = slots[SlotCount - 1];
-        if (!last.IsEmpty)
+        if( !last.IsEmpty)
         {
             printText += $"{last.ItemData.itemName}({last.ItemCount})";
         }
         else
         {
-            printText += "(ºóÄ­)";
+            printText += "(ë¹ˆì¹¸)";
         }
         printText += " ]";
 

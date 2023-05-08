@@ -17,7 +17,7 @@ public class DetailWindow : MonoBehaviour
         set
         {
             isPause = value;
-            if (isPause)
+            if(isPause)
             {
                 Close();
             }
@@ -47,7 +47,7 @@ public class DetailWindow : MonoBehaviour
 
     private void Update()
     {
-        if (alphaTarget > 0.0f)
+        if( alphaTarget > 0.0f )
         {
             canvasGroup.alpha += Time.deltaTime * alphaChangeSpeed;
         }
@@ -59,56 +59,56 @@ public class DetailWindow : MonoBehaviour
     }
 
     /// <summary>
-    /// »ó¼¼Ã¢À» ¿©´Â ÇÔ¼ö
+    /// ìƒì„¸ì°½ì„ ì—¬ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="data">¿­¸é¼­ Ç¥½ÃÇÒ µ¥ÀÌÅÍ</param>
+    /// <param name="data">ì—´ë©´ì„œ í‘œì‹œí•  ë°ì´í„°</param>
     public void Open(ItemData data)
     {
-        if (!isPause && data != null)        // ÀÏ½Ã Á¤Áö »óÅÂ°¡ ¾Æ´Ï°í µ¥ÀÌÅÍ°¡ ÀÖÀ»¶§¸¸ ¿­±â
+        if(!isPause && data != null)        // ì¼ì‹œ ì •ì§€ ìƒíƒœê°€ ì•„ë‹ˆê³  ë°ì´í„°ê°€ ìˆì„ë•Œë§Œ ì—´ê¸°
         {
-            itemIcon.sprite = data.itemIcon;                    // ¾ÆÀÌÄÜ ÀÌ¹ÌÁö ¼³Á¤
-            itemName.text = data.itemName;                      // ÀÌ¸§ ¼³Á¤
-            itemPrice.text = data.price.ToString();             // °¡°İ ¼³Á¤
-            itemDescription.text = data.itemDescription;        // »ó¼¼ ¼³¸í ¼³Á¤
+            itemIcon.sprite = data.itemIcon;                    // ì•„ì´ì½˜ ì´ë¯¸ì§€ ì„¤ì •
+            itemName.text = data.itemName;                      // ì´ë¦„ ì„¤ì •
+            itemPrice.text = data.price.ToString();             // ê°€ê²© ì„¤ì •
+            itemDescription.text = data.itemDescription;        // ìƒì„¸ ì„¤ëª… ì„¤ì •
 
-            alphaTarget = 1;                // º¸ÀÌ°Ô²û alpha ¸ñÇ¥Ä¡ ¼³Á¤
+            alphaTarget = 1;                // ë³´ì´ê²Œë” alpha ëª©í‘œì¹˜ ì„¤ì •
 
-            MovePosition(Mouse.current.position.ReadValue());   // ¿­¸± ¶§ ¸¶¿ì½º À§Ä¡ ±âÁØÀ¸·Î ¿­±â
+            MovePosition(Mouse.current.position.ReadValue());   // ì—´ë¦´ ë•Œ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ê¸°ì¤€ìœ¼ë¡œ ì—´ê¸°
         }
     }
 
     /// <summary>
-    /// »ó¼¼Ã¢À» ´İ´Â ÇÔ¼ö
+    /// ìƒì„¸ì°½ì„ ë‹«ëŠ” í•¨ìˆ˜
     /// </summary>
     public void Close()
     {
-        alphaTarget = 0;    // ¾Èº¸ÀÌ°Ô²û alpha ¸ñÇ¥Ä¡ ¼³Á¤
+        alphaTarget = 0;    // ì•ˆë³´ì´ê²Œë” alpha ëª©í‘œì¹˜ ì„¤ì •
     }
 
     /// <summary>
-    /// »ó¼¼ Á¤º¸Ã¢ÀÇ À§Ä¡¸¦ ¿Å±â´Â ÇÔ¼ö
+    /// ìƒì„¸ ì •ë³´ì°½ì˜ ìœ„ì¹˜ë¥¼ ì˜®ê¸°ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="screenPos">»õ À§Ä¡(½ºÅ©¸° ÁÂÇ¥)</param>
+    /// <param name="screenPos">ìƒˆ ìœ„ì¹˜(ìŠ¤í¬ë¦° ì¢Œí‘œ)</param>
     public void MovePosition(Vector2 screenPos)
     {
-        if (alphaTarget > 0)                // º¸ÀÏ¶§¸¸ ¿òÁ÷ÀÌ°Ô ÇÏ±â
+        if (alphaTarget > 0)                // ë³´ì¼ë•Œë§Œ ì›€ì§ì´ê²Œ í•˜ê¸°
         {
             RectTransform rect = (RectTransform)transform;
 
             int diffX = (int)(screenPos.x + rect.sizeDelta.x) - Screen.width;
-            diffX = Mathf.Max(0, diffX);    // ³ÑÄ£ºÎºĞ¸¸Å­¸¸ ¿ŞÂÊÀ¸·Î º¸³»±â
-            screenPos.x -= diffX;           // È­¸éÀ» ¾È¹ş¾î³ª°Ô ¸¸µé±â
+            diffX = Mathf.Max(0, diffX);    // ë„˜ì¹œë¶€ë¶„ë§Œí¼ë§Œ ì™¼ìª½ìœ¼ë¡œ ë³´ë‚´ê¸°
+            screenPos.x -= diffX;           // í™”ë©´ì„ ì•ˆë²—ì–´ë‚˜ê²Œ ë§Œë“¤ê¸°
 
-            //if (screenPos.x + rect.sizeDelta.x > Screen.width)   // °¡·Î·Î ¹ş¾î³­ °æ¿ì
+            //if (screenPos.x + rect.sizeDelta.x > Screen.width)   // ê°€ë¡œë¡œ ë²—ì–´ë‚œ ê²½ìš°
             //{
-            //    screenPos.x -= rect.sizeDelta.x;                // µğÅ×ÀÏÃ¢ °¡·Î Å©±â¸¸Å­ ¿ŞÂÊÀ¸·Î º¸³»±â
+            //    screenPos.x -= rect.sizeDelta.x;                // ë””í…Œì¼ì°½ ê°€ë¡œ í¬ê¸°ë§Œí¼ ì™¼ìª½ìœ¼ë¡œ ë³´ë‚´ê¸°
             //}
-            //if (screenPos.y - rect.sizeDelta.y < 0)             // ¼¼·Î·Î ¹ş¾î³­ °æ¿ì
+            //if (screenPos.y - rect.sizeDelta.y < 0)             // ì„¸ë¡œë¡œ ë²—ì–´ë‚œ ê²½ìš°
             //{
-            //    screenPos.y += rect.sizeDelta.y;                // µğÅ×ÀÏÃ¢ ¼¼·Î Å©±â¸¸Å­ À§·Î º¸³»±â
+            //    screenPos.y += rect.sizeDelta.y;                // ë””í…Œì¼ì°½ ì„¸ë¡œ í¬ê¸°ë§Œí¼ ìœ„ë¡œ ë³´ë‚´ê¸°
             //}
 
-            transform.position = screenPos;     // À§Ä¡ º¯°æ
+            transform.position = screenPos;     // ìœ„ì¹˜ ë³€ê²½
         }
     }
 }

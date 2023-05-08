@@ -2366,8 +2366,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8855052669661678444}
   - component: {fileID: 9036980633323257398}
-  - component: {fileID: 1684491253}
-  - component: {fileID: 1684491256}
+  - component: {fileID: 810496200}
+  - component: {fileID: 810496201}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2405,7 +2405,7 @@ Animator:
   m_GameObject: {fileID: 8189980434977739222}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 0308cf4e83cf517488b60af58b290fe0, type: 3}
-  m_Controller: {fileID: 9100000, guid: c735c2515d00ed94c952f936e7c8e34c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 938d04fbe26a01d448d3c74adc58bfe1, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2415,7 +2415,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!143 &1684491253
+--- !u!143 &810496200
 CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2433,7 +2433,7 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
---- !u!114 &1684491256
+--- !u!114 &810496201
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2442,12 +2442,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8189980434977739222}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 446992d327efa734bbdac3c2b63ec7a5, type: 3}
+  m_Script: {fileID: 11500000, guid: adf696e02534bc54a81df53086c90b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   walkSpeed: 3
   runSpeed: 5
-  turnSpedd: 10
+  turnSpeed: 10
 --- !u!1 &8206070634150816031
 GameObject:
   m_ObjectHideFlags: 0

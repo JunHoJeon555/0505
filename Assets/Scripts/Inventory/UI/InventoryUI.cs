@@ -2,35 +2,50 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
     /// <summary>
-    /// ½½·ÔÀ» ´Ù½Ã ¸¸µé ¶§ ÇÊ¿äÇÑ ÇÁ¸®ÆÕ
+    /// ìŠ¬ë¡¯ì„ ë‹¤ì‹œ ë§Œë“¤ë•Œ í•„ìš”í•œ í”„ë¦¬íŒ¹
     /// </summary>
     public GameObject slotPrefab;
 
     /// <summary>
-    /// ÀÌ UI°¡ º¸¿©ÁÙ ÀÎº¥Åä¸®
+    /// ì´ UIê°€ ë³´ì—¬ì¤„ ì¸ë²¤í† ë¦¬
     /// </summary>
     Inventory inven;
 
+    public Player Owner => inven.Owner;
+
     /// <summary>
-    /// ÀÌ ÀÎº¥Åä¸® UI¿¡ ÀÖ´Â ¸ğµç ½½·Ô UI
+    /// ì´ ì¸ë²¤í† ë¦¬ UIì— ìˆëŠ” ëª¨ë“  ìŠ¬ë¡¯UI
     /// </summary>
     ItemSlotUI[] slotUIs;
+
     /// <summary>
-    /// ¾ÆÀÌÅÛ ÀÌµ¿ÀÌ³ª ºĞ¸®ÇÒ ¶§ »ç¿ëÇÒ ÀÓ½Ã ½½·Ô UI
+    /// ì•„ì´í…œ ì´ë™ì´ë‚˜ ë¶„ë¦¬í•  ë•Œ ì‚¬ìš©í•  ì„ì‹œ ìŠ¬ë¡¯UI 
     /// </summary>
     TempItemSlotUI tempSlotUI;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀÇ »ó¼¼Á¤º¸¸¦ º¸¿©ÁÖ´Â Ã¢
+    /// ì•„ì´í…œì˜ ìƒì„¸ì •ë³´ë¥¼ ë³´ì—¬ì£¼ëŠ” ì°½
     /// </summary>
     DetailWindow detail;
 
+    /// <summary>
+    /// ìŠ¬ë¡¯ì— ë“¤ì–´ìˆëŠ” ì•„ì´í…œì„ ë¶„ë¦¬í•˜ê¸° ìœ„í•œ ì°½
+    /// </summary>
+    ItemSpliterUI spliter;
+
+    /// <summary>
+    /// Ownerê°€ ê°€ì§€ê³  ìˆëŠ” ëˆì„ í‘œì‹œí•˜ëŠ” ì°½
+    /// </summary>
+    MoneyPanel money;
+
     PlayerInputActions inputActions;
+    bool isShiftPress = false;
 
     private void Awake()
     {
@@ -41,24 +56,34 @@ public class InventoryUI : MonoBehaviour
 
         detail = GetComponentInChildren<DetailWindow>();
 
+        spliter = GetComponentInChildren<ItemSpliterUI>();
+        spliter.onOKClick += OnSplitOK;
+
         inputActions = new PlayerInputActions();
 
+        money = GetComponentInChildren<MoneyPanel>();
     }
 
     private void OnEnable()
     {
         inputActions.UI.Enable();
+        inputActions.UI.Shift.performed += OnShiftPress;
+        inputActions.UI.Shift.canceled += OnShiftPress;
+        inputActions.UI.Click.canceled += OnItemDrop;
     }
 
     private void OnDisable()
     {
+        inputActions.UI.Click.canceled -= OnItemDrop;
+        inputActions.UI.Shift.canceled -= OnShiftPress;
+        inputActions.UI.Shift.performed -= OnShiftPress;
         inputActions.UI.Disable();
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸® UI ÃÊ±âÈ­
+    /// ì¸ë²¤í† ë¦¬ UI ì´ˆê¸°í™”
     /// </summary>
-    /// <param name="playerInven">ÀÌ UI°¡ Ç¥½ÃÇÒ ÀÎº¥Åä¸®</param>
+    /// <param name="playerInven">ì´ UIê°€ í‘œì‹œí•  ì¸ë²¤í† ë¦¬</param>
     public void InitializeInventory(Inventory playerInven)
     {
         inven = playerInven;
@@ -66,35 +91,35 @@ public class InventoryUI : MonoBehaviour
         Transform slotParent = transform.GetChild(0);
         GridLayoutGroup layout = slotParent.GetComponent<GridLayoutGroup>();
 
-        if (Inventory.Default_Inventory_Size != inven.SlotCount)
+        if( Inventory.Default_Inventory_Size != inven.SlotCount )   
         {
-            // ±âº» Å©±â¿Í ´Ş¶óÁ³À» ¶§
+            // ê¸°ë³¸ í¬ê¸°ì™€ ë‹¬ë¼ì¡Œì„ ë•Œ
 
-            // ¹Ì¸® ¸¸µé¾îÁ® ÀÖ´ø ½½·Ô ¸ğµÎ »èÁ¦
-            foreach (var slot in slotUIs)
+            // ë¯¸ë¦¬ ë§Œë“¤ì–´ì ¸ ìˆë˜ ìŠ¬ë¡¯ ëª¨ë‘ ì‚­ì œ
+            foreach ( var slot in slotUIs )
             {
-                Destroy(slot.gameObject);
+                Destroy( slot.gameObject );     
             }
 
-            // ¼¿ Å©±â °è»êÇÏ±â
+            // ì…€ í¬ê¸° ê³„ì‚°í•˜ê¸°
             RectTransform rect = (RectTransform)slotParent;
-            float totalArea = rect.rect.height * rect.rect.width;   // ºÎ¸ğ ¿µ¿ªÀÇ ÀüÃ¼ ³ĞÀÌ
-            float slotArea = totalArea / inven.SlotCount;           // ½½·Ô ÇÏ³ª°¡ °¡Áú ¼ö ÀÖ´Â ³ĞÀÌ
-            float slotSideLength = Mathf.Floor(Mathf.Sqrt(slotArea)); // ½½·Ô ÇÑº¯ÀÇ ±æÀÌ ±¸ÇÏ±â
-            layout.cellSize = new Vector2(slotSideLength, slotSideLength); // ±¸ÇÑ ±æÀÌ·Î Àû¿ëÇÏ±â
+            float totalArea = rect.rect.height * rect.rect.width;   // ë¶€ëª¨ ì˜ì—­ì˜ ì „ì²´ ë„“ì´
+            float slotArea = totalArea / inven.SlotCount;           // ìŠ¬ë¡¯ í•˜ë‚˜ê°€ ê°€ì§ˆ ìˆ˜ ìˆëŠ” ë„“ì´
+            float slotSideLength = Mathf.Floor( Mathf.Sqrt( slotArea )); // ìŠ¬ë¡¯ í•œë³€ì˜ ê¸¸ì´ êµ¬í•˜ê¸°
+            layout.cellSize = new Vector2(slotSideLength, slotSideLength ); // êµ¬í•œ ê¸¸ì´ë¡œ ì ìš©í•˜ê¸°
 
-            // ½½·Ô »õ·Î ¸¸µé±â
+            // ìŠ¬ë¡¯ ìƒˆë¡œ ë§Œë“¤ê¸°
             slotUIs = new ItemSlotUI[inven.SlotCount];
             for (uint i = 0; i < inven.SlotCount; i++)
             {
-                GameObject obj = Instantiate(slotPrefab, slotParent);   // »ı¼ºÇÏ°í
-                obj.name = $"{slotPrefab.name}_{i}";                    // ÀÌ¸§ ºÙÀÌ°í
-                slotUIs[i] = obj.GetComponent<ItemSlotUI>();            // ÀúÀåÇØ ³õ±â
+                GameObject obj = Instantiate(slotPrefab, slotParent);   // ìƒì„±í•˜ê³ 
+                obj.name = $"{slotPrefab.name}_{i}";                    // ì´ë¦„ ë¶™ì´ê³ 
+                slotUIs[i] = obj.GetComponent<ItemSlotUI>();            // ì €ì¥í•´ ë†“ê¸°
             }
         }
 
-        // ½½·ÔÀÇ ÃÊ±âÈ­ ÀÛ¾÷
-        for (uint i = 0; i < inven.SlotCount; i++)
+        // ìŠ¬ë¡¯ì˜ ì´ˆê¸°í™” ì‘ì—…
+        for(uint i=0;i<inven.SlotCount;i++)
         {
             slotUIs[i].InitializeSlot(i, inven[i]);
             slotUIs[i].onDragBegin += OnItemMoveBegin;
@@ -103,63 +128,82 @@ public class InventoryUI : MonoBehaviour
             slotUIs[i].onPointerEnter += OnItemDetailOn;
             slotUIs[i].onPointerExit += OnItemDetailOff;
             slotUIs[i].onPointerMove += OnSlotPointerMove;
-
         }
-        // ÀÓ½Ã ½½·Ô ÃÊ±âÈ­
-        tempSlotUI.InitializeSlot(Inventory.TempSlotIndex, inven.TempSlot); // ÀÓ½Ã½½·Ôµµ ÃÊ±âÈ­
+        // ì„ì‹œ ìŠ¬ë¡¯ ì´ˆê¸°í™”
+        tempSlotUI.InitializeSlot(Inventory.TempSlotIndex, inven.TempSlot); // ì„ì‹œìŠ¬ë¡¯ë„ ì´ˆê¸°í™”
         tempSlotUI.onTempSlotOpenClose += OnDetailPause;
-        tempSlotUI.Close();     // ½ÃÀÛÇÏ¸é ²¨³õ±â
-   
-        //»ó¼¼Á¤Ã¢ ´İ¾Æ³õ±â
+        tempSlotUI.Close();     // ì‹œì‘í•˜ë©´ êº¼ë†“ê¸°
+
+        // ìƒì„¸ì •ë³´ì°½ ë‹«ì•„ ë†“ê¸°
         detail.Close();
+
+        // ë¶„ë¦¬ì°½ ë‹«ê¸°
+        spliter.Close();
+
+        //ì˜¤ë„ˆì˜ ëˆì´ ë³€ê²½ë  ë•Œ ë¨¸ë‹ˆ íŒ¨ë„ì˜ Refreshí•¨ìˆ˜ ì‹¤í–‰í•˜ë„ë¡ í•¨ìˆ˜ ë“±ë¡
+        Owner.onMoneyChange += money.Refresh;
+        money.Refresh(Owner.Money);     //ì²«ë²ˆì§¸ëŠ” ê°•ì œ ë¦¬ìŠ¤ë ˆì‹œ
     }
 
-    
-
     /// <summary>
-    /// ¸¶¿ì½º µå·¡±×°¡ ½ÃÀÛµÇ¾úÀ» ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö
+    /// ë§ˆìš°ìŠ¤ ë“œë˜ê·¸ê°€ ì‹œì‘ë˜ì—ˆì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="slotID">µå·¡±× ½ÃÀÛ ½½·ÔÀÇ ID</param>
+    /// <param name="slotID">ë“œë˜ê·¸ ì‹œì‘ ìŠ¬ë¡¯ì˜ ID</param>
     private void OnItemMoveBegin(uint slotID)
     {
-        inven.MoveItem(slotID, tempSlotUI.ID);  // ½ÃÀÛ ½½·ÔÀÇ ³»¿ë°ú ÀÓ½Ã ½½·ÔÀÇ ³»¿ëÀ» ¼­·Î ±³Ã¼½ÃÅ°±â
-        tempSlotUI.Open();                      // ÀÓ½Ã ½½·Ô º¸ÀÌ°Ô ¸¸µé±â
+        inven.MoveItem(slotID, tempSlotUI.ID);  // ì‹œì‘ ìŠ¬ë¡¯ì˜ ë‚´ìš©ê³¼ ì„ì‹œ ìŠ¬ë¡¯ì˜ ë‚´ìš©ì„ ì„œë¡œ êµì²´ì‹œí‚¤ê¸°
+        tempSlotUI.Open();                      // ì„ì‹œ ìŠ¬ë¡¯ ë³´ì´ê²Œ ë§Œë“¤ê¸°
     }
 
     /// <summary>
-    /// ¸¶¿ì½º µå·¡±×°¡ ³¡³µÀ» ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö
+    /// ë§ˆìš°ìŠ¤ ë“œë˜ê·¸ê°€ ëë‚¬ì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="slotID">µå·¡±×°¡ ³¡³­ ½½·ÔÀÇ ID</param>
-    private void OnItemMoveEnd(uint slotID , bool isSuccess)
+    /// <param name="slotID">ë“œë˜ê·¸ê°€ ëë‚œ ìŠ¬ë¡¯ì˜ ID</param>
+    /// <param name="isSuccess">ë“œë˜ê·¸ê°€ ì„±ê³µì ìœ¼ë¡œ ëë‚¬ìœ¼ë©´ true, ì·¨ì†Œë˜ì—ˆìœ¼ë©´ false</param>
+    private void OnItemMoveEnd(uint slotID, bool isSuccess)
     {
-        inven.MoveItem(tempSlotUI.ID, slotID);  // ÀÓ½Ã ½½·ÔÀÇ ³»¿ë°ú µå·¡±×°¡ ³¡³­ ½½·ÔÀÇ ³»¿ëÀ» ¼­·Î ±³Ã¼½ÃÅ°±â
-        if(tempSlotUI.ItemSlot.IsEmpty)         // ±³Ã¼ °á°ú ÀÓ½Ã ½½·ÔÀÌ ºñ°Ô µÇ¸é
+        inven.MoveItem(tempSlotUI.ID, slotID);  // ì„ì‹œ ìŠ¬ë¡¯ì˜ ë‚´ìš©ê³¼ ë“œë˜ê·¸ê°€ ëë‚œ ìŠ¬ë¡¯ì˜ ë‚´ìš©ì„ ì„œë¡œ êµì²´ì‹œí‚¤ê¸°
+        if(tempSlotUI.ItemSlot.IsEmpty)         // êµì²´ ê²°ê³¼ ì„ì‹œ ìŠ¬ë¡¯ì´ ë¹„ê²Œ ë˜ë©´
         {
-            tempSlotUI.Close();                 // ÀÓ½Ã ½½·Ô ºñÈ°¼ºÈ­ÇØ¼­ ¾Èº¸ÀÌ°Ô ¸¸µé±â
+            tempSlotUI.Close();                 // ì„ì‹œ ìŠ¬ë¡¯ ë¹„í™œì„±í™”í•´ì„œ ì•ˆë³´ì´ê²Œ ë§Œë“¤ê¸°
         }
+
         if(isSuccess)
         {
-            detail.Open(inven[slotID].ItemData);// µå·¡±×°¡ ¼º°øÀûÀ¸·Î ³¡³µÀ¸¸é »ó¼¼Á¤º¸Ã¢ º¸¿©ÁÖ±â
-
+            detail.Open(inven[slotID].ItemData);// ë“œë˜ê·¸ê°€ ì„±ê³µì ìœ¼ë¡œ ëë‚¬ìœ¼ë©´ ìƒì„¸ì •ë³´ì°½ ë³´ì—¬ì£¼ê¸°
         }
     }
 
     /// <summary>
-    /// ½½·ÔÀ» Å¬¸¯ÇßÀ» ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö
+    /// ìŠ¬ë¡¯ì„ í´ë¦­í–ˆì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="slotID">Å¬¸¯µÈ ½½·ÔÀÇ ID</param>
+    /// <param name="slotID">í´ë¦­ëœ ìŠ¬ë¡¯ì˜ ID</param>
     private void OnSlotClick(uint slotID)
     {
-        if(!tempSlotUI.ItemSlot.IsEmpty)
+        if( !tempSlotUI.ItemSlot.IsEmpty )      
         {
-            // Å¬¸¯µÇ¾î ÀÖÁö ¾ÊÀ¸¸é µå·¡±×°¡ ³¡³­ °Í°ú °°Àº Ã³¸®
-            // ÀÓ½Ã½½·Ô°ú Å¬¸¯µÈ½½·ÔÀÇ ³»¿ëÀ» ¼­·Î ±³Ã¼
-            OnItemMoveEnd(slotID, true);
+            // ì„ì‹œ ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆì§€ ì•Šì„ ë•Œ(=ë“œë˜ê·¸ ëë‚¬ì„ ë•Œ ë‹¤ë¥¸ ì•„ì´í…œì´ ìˆì–´ì„œ êµì²´ í›„ ë“¤ê³  ìˆëŠ” ìƒí™©)
+            // ì´ë•ŒëŠ” ë“œë˜ê·¸ê°€ ëë‚¬ì„ ë•Œì™€ ë˜‘ê°™ì´ ì²˜ë¦¬í•œë‹¤.
+
+            OnItemMoveEnd(slotID, true);    // ì„ì‹œìŠ¬ë¡¯ê³¼ í´ë¦­ëœ ìŠ¬ë¡¯ì˜ ë‚´ìš©ì„ ì„œë¡œ êµì²´
+        }
+        else
+        {
+            // ì„ì‹œ ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆëŠ”ë° í´ë¦­í–ˆë‹¤.
+            if( isShiftPress)
+            {
+                // ì•„ì´í…œ ë¶„ë¦¬ ìš©ë„ë¡œ í´ë¦­í–ˆë‹¤.
+                OnSplitOpen(slotID);                
+            }
+            else
+            {
+                // ì•„ì´í…œ ì‚¬ìš© ìš©ë„ë¡œ í´ë¦­í–ˆë‹¤.
+            }
         }
     }
 
     /// <summary>
-    /// ¸¶¿ì½º Æ÷ÀÎÅÍ°¡ ½½·Ô¿¡ µé°Å°¬À» ¶§ ±× ½½·ÔÀÇ ¾ÆÀÌÅÛ Á¤º¸¸¦ »ó¼¼È÷ º¸¿©ÁÖ´Â Ã¢ ¿©´Â ÇÔ¼ö
+    /// ë§ˆìš°ìŠ¤ í¬ì¸í„°ê°€ ìŠ¬ë¡¯ì— ë“¤ì–´ê°”ì„ ë•Œ ê·¸ ìŠ¬ë¡¯ì˜ ì•„ì´í…œ ì •ë³´ë¥¼ ìƒì„¸íˆ ë³´ì—¬ì£¼ëŠ” ì°½ ì—¬ëŠ” í•¨ìˆ˜
     /// </summary>
     /// <param name="slotID"></param>
     private void OnItemDetailOn(uint slotID)
@@ -168,33 +212,99 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸¶¿ì½º Æ÷ÀÎÅÍ°¡ ½½·Ô¿¡¼­ ³ª°¬À» ¶§ ¾ÆÀÌÅÛ »ó¼¼Á¤º¸Ã¢À» ´İ´Â ÇÔ¼ö
+    /// ë§ˆìš°ìŠ¤ í¬ì¸í„°ê°€ ìŠ¬ë¡¯ì—ì„œ ë‚˜ê°”ì„ ë•Œ ì•„ì´í…œ ìƒì„¸ì •ë³´ì°½ì„ ë‹«ëŠ” í•¨ìˆ˜
     /// </summary>
     /// <param name="slotID"></param>
     private void OnItemDetailOff(uint slotID)
     {
         detail.Close();
     }
+
     /// <summary>
-    /// ¸¶¿ì½º°¡ ½½·Ô¾È¿¡¼­ ¿òÁ÷ÀÏ ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö
+    /// ë§ˆìš°ìŠ¤ê°€ ìŠ¬ë¡¯ì•ˆì—ì„œ ì›€ì§ì¼ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="screenPos">¸¶¿ì½º Ä¿¼­ÀÇ ½ºÅ©¸° ÁÂÇ¥</param>
+    /// <param name="screenPos">ë§ˆìš°ìŠ¤ ì»¤ì„œì˜ ìŠ¤í¬ë¦° ì¢Œí‘œ</param>
     private void OnSlotPointerMove(Vector2 screenPos)
     {
-        detail.MovePosition(screenPos); // µğÅ×ÀÏ Ã¢ ÀÌµ¿½ÃÅ°±â
+        detail.MovePosition(screenPos); // ë””í…Œì¼ ì°½ ì´ë™ì‹œí‚¤ê¸°
     }
 
     /// <summary>
-    /// µğÅ×ÀÏÃ¢ÀÌ ÀÏ½ÃÁ¤Áö µÉÁö ¸»Áö¸¦ °áÁ¤ÇÏ´Â ÇÔ¼ö(ÁÖ·Î ÀÓ½Ã½½·ÔÀÌ ¿­¸± ¶§ ÀÏ½ÃÁ¤ÁöÇÔ)
+    /// ë””í…Œì¼ì°½ì´ ì¼ì‹œ ì •ì§€ ë ì§€ ë§ì§€ë¥¼ ê²°ì •í•˜ëŠ” í•¨ìˆ˜(ì£¼ë¡œ ì„ì‹œìŠ¬ë¡¯ì´ ì—´ë¦´ë•Œ ì¼ì‹œì •ì§€í•¨)
     /// </summary>
-    /// <param name="isPause">true¸é ÀÏ½ÃÁ¤±â, false¸é ÀÏ½ÃÁ¤ÁöÇØÁ¦</param>
+    /// <param name="isPause">trueë©´ ì¼ì‹œì •ì§€, falseë©´ ì¼ì‹œì •ì§€ í•´ì œ</param>
     private void OnDetailPause(bool isPause)
     {
         detail.IsPause = isPause;
     }
 
-    public void TestInventory()
+    /// <summary>
+    /// ì•„ì´í…œ ë¶„ë¦¬ì°½ ì—¬ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="slotID">ì•„ì´í…œì„ ë¶„ë¦¬í•  ìŠ¬ë¡¯ì˜ ID</param>
+    private void OnSplitOpen(uint slotID)
     {
+        ItemSlotUI targetSlotUI = slotUIs[slotID];  // transformì´ í•„ìš”í•´ì„œ ItemSlotUI ê°€ì ¸ì˜´
+        spliter.transform.position = targetSlotUI.transform.position + Vector3.up * 100;    // ìŠ¬ë¡¯ì˜ ìœ„ìª½ì— ë°°ì¹˜
+        spliter.Open(targetSlotUI.ItemSlot);        // ë¶„ë¦¬ì°½ ì—´ê¸°
+        detail.IsPause = true;                      // ë””í…Œì¼ì°½ ì¼ì‹œ ì •ì§€ ì‹œí‚¤ê¸°.(ë‚´ë¶€ì—ì„œ ì•Œì•„ì„œ ë‹«ìŒ)
+    }
 
+    /// <summary>
+    /// ì•„ì´í…œ ë¶„ë¦¬ì°½ì—ì„œ OKë²„íŠ¼ì´ ëˆŒëŸ¬ì¡Œì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="slotID">ì•„ì´í…œì„ ë¶„ë¦¬í•  ìŠ¬ë¡¯ì˜ ì•„ì´ë””</param>
+    /// <param name="count">ëœì–´ë‚¼ ì•„ì´í…œ ê°¯ìˆ˜</param>
+    private void OnSplitOK(uint slotID, uint count)
+    {
+        inven.SplitItem(slotID, count);
+        tempSlotUI.Open();
+    }
+
+    /// <summary>
+    /// ì‰¬í”„íŠ¸í‚¤ë¥¼ ëˆŒë €ì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="context"></param>
+    private void OnShiftPress(InputAction.CallbackContext context)
+    {
+        isShiftPress = !context.canceled;
+    }
+
+
+    /// <summary>
+    /// ì„ì‹œ ìŠ¬ë¡¯ì´ ë“¤ê³  ìˆëŠ” ì•„ì´í…œì„ ë“œë ì‹œë„í•˜ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="_"></param>
+    private void OnItemDrop(InputAction.CallbackContext _)
+    {
+        Vector2 screenPos = Mouse.current.position.ReadValue(); // ë§ˆìš°ìŠ¤ ì»¤ì„œ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
+        if (!IsInInventoryArea(screenPos))
+        {
+            // ì¸ë²¤í† ë¦¬ ì˜ì—­ ë°–ì´ë©´
+            tempSlotUI.OnDrop(screenPos);   // ì•„ì´í…œ ë“œë ì‹œë„
+        }
+    }
+
+    /// <summary>
+    /// screenPosê°€ ì¸ë²¤í† ë¦¬UI ì•ˆì¸ì§€ ë°–ì¸ì§€ í™•ì¸í•˜ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="screenPos">í™•ì¸í•  ìŠ¤í¬ë¦° ì¢Œí‘œ</param>
+    /// <returns>trueë©´ ì¸ë²¤í† ë¦¬ ì•ˆìª½, falseë©´ ì¸ë²¤í† ë¦¬ ë°–</returns>
+    private bool IsInInventoryArea(Vector2 screenPos)
+    {
+        RectTransform rect = (RectTransform)transform;
+        Vector2 min = new(rect.position.x - rect.sizeDelta.x, rect.position.y); // ì‚¬ê°í˜•ì˜ ì™¼ìª½ ì•„ë˜
+        Vector2 max = new(rect.position.x, rect.position.y + rect.sizeDelta.y); // ì‚¬ê°í˜•ì˜ ì˜¤ë¥¸ìª½ ìœ„
+
+        return min.x < screenPos.x && screenPos.x < max.x && min.y < screenPos.y && screenPos.y < max.y;
+    }
+
+    /// <summary>
+    /// í…ŒìŠ¤íŠ¸ ìš©ë„
+    /// </summary>
+    /// <param name="id"></param>
+    public void TestInventory_Spliter(uint id)
+    {
+        spliter.Open(inven[id]);
     }
 }

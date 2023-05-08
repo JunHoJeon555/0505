@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac568cd16e7b6345b0f5225374f8fb8, type: 3}
+  m_Name: 07_Beer
+  m_EditorClassIdentifier: 
+  code: 0
+  itemName: "\uC544\uC774\uD15C"
+  modelPrefab: {fileID: 2675384498323582102, guid: b2c510af25f267643a740d9388248dce,
+    type: 3}
+  itemIcon: {fileID: 21300000, guid: ea55e0ae186d59d41a0b270559045dd7, type: 3}
+  price: 0
+  maxStackCount: 1
+  itemDescription: "\uC124\uBA85"
+  manaAmount: 30
+  duration: 3

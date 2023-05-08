@@ -2,19 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemSpliterUI : MonoBehaviour
 {
     /// <summary>
-    /// ¾ÆÀÌÅÛ ³ª´­ ÃÖ¼Ò °¹¼ö(³ª´©±â¸¦ ½ÃµµÇÏ¸é ÃÖ¼Ò1°³¸¦ ³ª´«´Ù)
+    /// ì•„ì´í…œ ë¶„ë¦¬í•  ìµœì†Œ ê°¯ìˆ˜(ë‚˜ëˆ„ê¸°ë¥¼ ì‹œë„í•˜ë©´ ìµœì†Œ 1ê°œëŠ” ë‚˜ëˆˆë‹¤.)
     /// </summary>
     const int itemCountMin = 1;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ½ÇÁ¦·Î ºĞ¸®ÇÒ °¹¼ö
+    /// ì•„ì´í…œì„ ì‹¤ì œë¡œ ë¶„ë¦¬í•  ê°¯ìˆ˜
     /// </summary>
     uint itemSplitCount = itemCountMin;
     uint ItemSplitCount
@@ -22,90 +21,113 @@ public class ItemSpliterUI : MonoBehaviour
         get => itemSplitCount;
         set
         {
-            if(itemSplitCount != value)
-            {
-                itemSplitCount = (uint)Mathf.Clamp((int)value,itemCountMin,(int)(targetSlot.ItemCount-1));
+            // ìˆ«ì ì…ë ¥ë¬ì„ ë•Œ 1~ìµœëŒ€ì¹˜ê¹Œì§€ë¡œ ì¡°ì ˆ
+            itemSplitCount = (uint)Mathf.Clamp((int)value, itemCountMin, (int)(targetSlot.ItemCount - 1));
 
-                inputField.text = itemSplitCount.ToString();
-                slider.value = itemSplitCount;
-            }
+            // ì¸í’‹í•„ë“œì™€ ìŠ¬ë¼ì´ë”ì—ë„ ë°˜ì˜
+            inputField.text = itemSplitCount.ToString();
+            slider.value = itemSplitCount;
         }
     }
+
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ³ª´­ ½½·Ô
+    /// ì•„ì´í…œì„ ë¶„ë¦¬í•  ìŠ¬ë¡¯
     /// </summary>
     ItemSlot targetSlot;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛÀ» ºĞ¸®ÇÒ °¹¼ö¸¦ Á÷Á¢ÀÔ·ÂÇÒ ¼ö ÀÖ´Â ÀÎÇ² ÇÊµå
+    /// ì•„ì´í…œì„ ë¶„ë¦¬í•  ê°¯ìˆ˜ë¥¼ ì§ì ‘ ì…ë ¥í•  ìˆ˜ ìˆëŠ” ì¸í’‹ í•„ë“œ
     /// </summary>
     TMP_InputField inputField;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛ ºĞ¸® °¹¼ö¸¦ Á¶ÀıÇÒ ¼ö ÀÖ´Â ½½¶óÀÌ´õ
+    /// ì•„ì´í…œ ë¶„ë¦¬ ê°¯ìˆ˜ë¥¼ ì¡°ì ˆí•  ìˆ˜ ìˆëŠ” ìŠ¬ë¼ì´ë”
     /// </summary>
     Slider slider;
 
     /// <summary>
-    /// ºĞ¸®ÇÒ ¾ÆÀÌÅÛÀÇ ¾ÆÀÌÄÜ
+    /// ë¶„ë¦¬í•  ì•„ì´í…œì˜ ì•„ì´ì½˜
     /// </summary>
     Image itemImage;
 
     /// <summary>
-    /// ok¹öÆ°À» ´­·¶À» ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö
-    /// ÆÄ¶ó¸ŞÅ¸(½½·ÔÀÇ ÀÎµ¦½º, ³ª´­°¹¼ö)
+    /// OKë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
+    /// íŒŒë¼ë©”í„°(ìŠ¬ë¡¯ì˜ ì¸ë±ìŠ¤, ë‚˜ëˆŒ ê°¯ìˆ˜)
     /// </summary>
-    public Action<uint, uint> onOkClick;
+    public Action<uint, uint> onOKClick;
 
-
-    // 1. awake¿¡¼­ ÇÊ¿äÇÑ ÄÄÆ÷³ÍÆ® Ã£±â
-    // 2. ÀÎÇ²ÇÊµå¿Í ½½¶óÀÌ´õ¸¦ ¿¬µ¿½ÃÅ°±â(ÇÏ³ª°¡ ¹Ù²î¸é ´Ù¸¥ ÇÏ³ªµµ °°ÀÌ º¯°æµÇ¾î¾ß ÇÑ´Ù.)
-    // 3. OK ¹öÆ°À» ´©¸£¸é ItemSplitCount¸¦ µğ¹ö±× Ã¢¿¡ Ãâ·ÂÇÏ±â
-    // 4. Cancel ¹öÆ°À» ´©¸£¸é "Ãë¼Ò"¶ó°í µğ¹ö±× Ã¢¿¡ Ãâ·ÂÇÏ±â
     private void Awake()
     {
+        // ì¸í’‹ í•„ë“œ
         inputField = GetComponentInChildren<TMP_InputField>();
+        inputField.onValueChanged.AddListener((text) =>
+        {
+            if( uint.TryParse(text, out uint result) )
+            {
+                ItemSplitCount = result;
+            }
+            else
+            {
+                ItemSplitCount = itemCountMin;
+            }
+        });
+
+        // ìŠ¬ë¼ì´ë”
         slider = GetComponentInChildren<Slider>();
-        //inputField.onValueChanged.AddListener((text)) =>
-            //if(uint.TryParse())
+        slider.onValueChanged.AddListener((value) => ItemSplitCount = (uint)value);
 
-
+        // ì•„ì´í…œ ì•„ì´ì½˜ ì´ë¯¸ì§€
         Transform child = transform.GetChild(0);
-        
-        itemImage= child.GetComponent<Image>();
-        
+        itemImage = child.GetComponent<Image>();
+
+        // ë”í•˜ê¸° ë²„íŠ¼
+        child = transform.GetChild(2);
+        Button plus = child.GetComponent<Button>();
+        plus.onClick.AddListener(() => ItemSplitCount++);
+
+        // ë§ˆì´ë„ˆìŠ¤ ë²„íŠ¼
+        child = transform.GetChild(3);
+        Button minus = child.GetComponent<Button>();
+        minus.onClick.AddListener(() => ItemSplitCount--);
+
+        // OK ë²„íŠ¼
+        child = transform.GetChild(5);
+        Button ok = child.GetComponent<Button>();
+        ok.onClick.AddListener(() =>
+        {
+            // targetSlot.Index ìŠ¬ë¡¯ì—ì„œ ItemSplitCountë§Œí¼ ëœì–´ë‚´ë¼ê³  ì•Œë¦¼
+            onOKClick?.Invoke(targetSlot.Index, ItemSplitCount);
+            Close();
+        });
+
+        // ì·¨ì†Œ ë²„íŠ¼
+        child = transform.GetChild(6);
+        Button cancel = child.GetComponent<Button>();
+        cancel.onClick.AddListener(Close);
     }
 
-    
-    private void Start()
-    {
-        //slider.onValueChanged.AddListener(delegate { valueChanged(slider, inputField)});
-    }
-
-    private void Update()
-    {
-        
-        slider.value = int.Parse(inputField.text);
-    }
-
+    /// <summary>
+    /// ì•„ì´í…œ ë¶„ë¦¬ì°½ì„ ì—¬ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="target">ì•„ì´í…œì„ ë¶„ë¦¬í•  ìŠ¬ë¡¯</param>
     public void Open(ItemSlot target)
     {
-        targetSlot = target;
-        ItemSplitCount = 1;
-        itemImage.sprite = targetSlot.ItemData.itemIcon;
-        slider.minValue = itemCountMin;
-        slider.maxValue = target.ItemCount -1;
-        gameObject.SetActive(true);
+        if(target.ItemCount > itemCountMin) // ìµœì†Œì¹˜ë³´ë‹¤ í´ë•Œë§Œ ë¶„ë¦¬ì‘ì—… ìˆ˜í–‰
+        {
+            targetSlot = target;                    // ìŠ¬ë¡¯ ì €ì¥
+            ItemSplitCount = itemCountMin;          // ê¸°ë³¸ ê°’ ì„¤ì •
+            itemImage.sprite = targetSlot.ItemData.itemIcon;    // ì•„ì´ì½˜ ì„¤ì •
+            slider.minValue = itemCountMin;         // ìŠ¬ë¼ì´ë” ë²”ìœ„ ì§€ì •
+            slider.maxValue = target.ItemCount - 1;
+            gameObject.SetActive(true);             // ë³´ì—¬ì£¼ê¸°
+        }
     }
-        
-    public void valueChanged(Slider slider , TMP_InputField inputField)
+
+    /// <summary>
+    /// ì•„ì´í…œ ë¶„ë¦¬ì°½ì„ ë‹«ëŠ” í•¨ìˆ˜
+    /// </summary>
+    public void Close()
     {
-        //int value = (int)(diff * slider.value);
+        gameObject.SetActive(false);
     }
-
-
-
-
-
-
 }

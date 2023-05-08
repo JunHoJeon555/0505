@@ -6,40 +6,78 @@ using UnityEngine.InputSystem;
 
 public class TempItemSlotUI : ItemSlotUI_Base
 {
+    /// <summary>
+    /// ì´ ì¸ë²¤í† ë¦¬ë¥¼ ê°€ì§€ê³  ìˆëŠ” ì†Œìœ ì
+    /// </summary>
+    Player owner;
 
     /// <summary>
-    /// ÀÓ½Ã ½½·ÔÀÌ ¿­¸®°Å³ª ´İÈú ¶§ ½ÇÇàµÇ´Â µ¨¸®°ÔÀÌÆ®. (true¸é ¿­·È´Ù. false¸é ´İÇû´Ù.)
+    /// ì„ì‹œ ìŠ¬ë¡¯ì´ ì—´ë¦¬ê±°ë‚˜ ë‹«í ë•Œ ì‹¤í–‰ë˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸. (trueë©´ ì—´ë ¸ë‹¤. falseë©´ ë‹«í˜”ë‹¤.)
     /// </summary>
     public Action<bool> onTempSlotOpenClose;
 
     private void Update()
     {
-        // È°¼ºÈ­ µÇ¾îÀÖÀ» ¶§ ¸Å ÇÁ·¹ÀÓ¸¶´Ù È£Ãâ
-        transform.position = Mouse.current.position.ReadValue();    // ¸¶¿ì½º À§Ä¡·Î ¿ÀºêÁ§Æ® ÀÌµ¿ ½ÃÅ°±â
+        // í™œì„±í™” ë˜ì–´ìˆì„ ë•Œ ë§¤ í”„ë ˆì„ë§ˆë‹¤ í˜¸ì¶œ
+        transform.position = Mouse.current.position.ReadValue();    // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¡œ ì˜¤ë¸Œì íŠ¸ ì´ë™ ì‹œí‚¤ê¸°
     }
 
     public override void InitializeSlot(uint id, ItemSlot slot)
     {
         onTempSlotOpenClose = null;
+
         base.InitializeSlot(id, slot);
+
+        owner = GameManager.Inst.InvenUI.Owner;
     }
 
     /// <summary>
-    /// TempSlotÀÌ º¸ÀÌ°Ô ÇÏ´Â ÇÔ¼ö
+    /// TempSlotì´ ë³´ì´ê²Œ í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void Open()
     {
-        transform.position = Mouse.current.position.ReadValue();    // ¿ì¼± À§Ä¡¸¦ ¸¶¿ì½º À§Ä¡·Î ¿Å±â°í
-        onTempSlotOpenClose?.Invoke(true);  // ¿­·È´Ù°í ¾Ë¸®±â
-        gameObject.SetActive(true);     // È°¼ºÈ­ ½ÃÄÑ¼­ º¸ÀÌ°Ô ¸¸µé±â
+        transform.position = Mouse.current.position.ReadValue();    // ìš°ì„  ìœ„ì¹˜ë¥¼ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¡œ ì˜®ê¸°ê³ 
+        onTempSlotOpenClose?.Invoke(true);  // ì—´ë ¸ë‹¤ê³  ì•Œë¦¬ê¸°
+        gameObject.SetActive(true);         // í™œì„±í™” ì‹œì¼œì„œ ë³´ì´ê²Œ ë§Œë“¤ê¸°
     }
 
     /// <summary>
-    /// TempSlotÀÌ º¸ÀÌÁö ¾Ê°Ô ÇÏ´Â ÇÔ¼ö
+    /// TempSlotì´ ë³´ì´ì§€ ì•Šê²Œ í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void Close()
     {
-        onTempSlotOpenClose?.Invoke(false); // ´İÇû´Ù°í ¾Ë¸®±â
-        gameObject.SetActive(false);    // ºñÈ°¼ºÈ­ ½ÃÄÑ¼­ º¸ÀÌÁö ¾Ê°Ô ¸¸µé°í Updateµµ ½ÇÇà¾ÈµÇ°Ô ÇÏ±â
+        onTempSlotOpenClose?.Invoke(false); // ë‹«í˜”ë‹¤ê³  ì•Œë¦¬ê¸°
+        gameObject.SetActive(false);        // ë¹„í™œì„±í™” ì‹œì¼œì„œ ë³´ì´ì§€ ì•Šê²Œ ë§Œë“¤ê³  Updateë„ ì‹¤í–‰ì•ˆë˜ê²Œ í•˜ê¸°
+    }
+
+    /// <summary>
+    /// ë°”ë‹¥ì— ì•„ì´í…œì„ ë“œëí•˜ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="screenPos">ë§ˆìš°ìŠ¤ ì»¤ì„œì˜ ìŠ¤í¬ë¦° ì¢Œí‘œ</param>
+    public void OnDrop(Vector2 screenPos)
+    {
+        if( !ItemSlot.IsEmpty ) // ìŠ¬ë¡¯ì— ì•„ì´í…œì´ ìˆì„ ë•Œë§Œ ë“œë
+        {
+            //Debug.Log($"ì•„ì´í…œ ë“œë : {ItemSlot.ItemData.itemName}, {ItemSlot.ItemCount}");
+            
+            Ray ray = Camera.main.ScreenPointToRay( screenPos );
+            if( Physics.Raycast(ray, out RaycastHit hit, 1000.0f, LayerMask.GetMask("Ground")) )
+            {
+                Vector3 dropPos = hit.point;    // í”¼í‚¹ ì§€ì  êµ¬í•˜ê¸°
+                //í”Œë ˆì´ì–´ ìœ„ì¹˜ì—ì„œ í”¼í‚¹ ì§€ì ìœ¼ë¡œ ê°€ëŠ” ë°©í–¥ êµ¬í•˜ê¸°
+                Vector3 dropDir = hit.point - owner.transform.position; 
+                if( dropDir.sqrMagnitude > owner.ItemPickupRange * owner.ItemPickupRange )
+                {
+                    // ì•„ì´í…œ íšë“ ë°˜ê²½ë³´ë‹¤ ë¨¼ê³³ì— ë“œëí•˜ë©´
+                    // ì•„ì´í…œ íšë“ ë°˜ê²½ ì§€ì ì— ë“œë
+                    dropPos = owner.transform.position + dropDir.normalized * owner.ItemPickupRange;
+                }
+
+                // ì•„ì´í…œ ìƒì„±
+                ItemFactory.MakeItem(ItemSlot.ItemData.code, ItemSlot.ItemCount, dropPos, true);
+                ItemSlot.ClearSlotItem();   // ìŠ¬ë¡¯ ë¹„ìš°ê³ 
+                Close();                    // ì„ì‹œ ìŠ¬ë¡¯ ë‹«ê¸°
+            }
+        }
     }
 }

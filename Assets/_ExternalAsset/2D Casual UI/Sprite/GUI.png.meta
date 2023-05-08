@@ -387,7 +387,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: _Gold
+      name: GUI_4
       rect:
         serializedVersion: 2
         x: 426
@@ -744,7 +744,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: GUI_21
+      name: _Gold
       rect:
         serializedVersion: 2
         x: 273
@@ -786,7 +786,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: _MonetBackground
+      name: _MoneyBackground
       rect:
         serializedVersion: 2
         x: 2599
@@ -879,7 +879,7 @@ TextureImporter:
         height: 926
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 118, y: 109, z: 119, w: 89}
+      border: {x: 91, y: 95, z: 101, w: 79}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1607,7 +1607,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 074148da63253744ca9e4d84f9bcc31f
+    spriteID: b0bc4415102546b48b4461ac29a67f51
     internalID: 0
     vertices: []
     indices: 
@@ -1615,6 +1615,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      GUI_4: 21300008
       _InvenBackground: 21300054
       GUI_26: 21300052
       GUI_3: 21300006
@@ -1626,11 +1627,9 @@ TextureImporter:
       GUI_15: 21300030
       _Close: 21300120
       GUI_54: 21300094
-      GUI_21: 21300042
       GUI_13: 21300026
       GUI_12: 21300024
       GUI_47: 21300084
-      _MonetBackground: 21300046
       GUI_9: 21300018
       GUI_57: 21300100
       GUI_43: 21300076
@@ -1645,15 +1644,16 @@ TextureImporter:
       GUI_31: 21300062
       GUI_7: 21300014
       GUI_8: 21300016
-      _Arrow: 21300066
+      GUI_60: 21300106
       GUI_28: 21300056
       GUI_5: 21300010
       _SlotBackground: 21300090
       GUI_0: 21300000
       GUI_61: 21300108
-      GUI_60: 21300106
+      _Arrow: 21300066
       GUI_42: 21300074
       GUI_34: 21300068
+      _MoneyBackground: 21300046
       GUI_32: 21300064
       GUI_19: 21300038
       GUI_53: 21300092
@@ -1674,7 +1674,7 @@ TextureImporter:
       GUI_48: 21300086
       GUI_65: 21300116
       GUI_25: 21300050
-      _Gold: 21300008
+      _Gold: 21300042
       GUI_18: 21300036
       GUI_64: 21300114
   spritePackingTag: 

@@ -4,111 +4,107 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ItemSlotUI : ItemSlotUI_Base, IDragHandler, IBeginDragHandler, IEndDragHandler,
+public class ItemSlotUI : ItemSlotUI_Base, IDragHandler, IBeginDragHandler, IEndDragHandler, 
     IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
     /// <summary>
-    /// µå·¡±× ½ÃÀÛÀ» ¾Ë¸®´Â µ¨¸®°ÔÀÌÆ®
+    /// ë“œë˜ê·¸ ì‹œì‘ì„ ì•Œë¦¬ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
     public Action<uint> onDragBegin;
 
     /// <summary>
-    /// µå·¡±× Á¾·á¸¦ ¾Ë¸®´Â µ¨¸®°ÔÀÌÆ®
+    /// ë“œë˜ê·¸ ì¢…ë£Œë¥¼ ì•Œë¦¬ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
-    public Action<uint , bool> onDragEnd;
+    public Action<uint, bool> onDragEnd;
 
     /// <summary>
-    /// ½½·ÔÀÌ Å¬¸¯µÇ¾úÀ» ¶§ ½ÇÇàµÇ´Â µ¨¸®°ÔÀÌÆ®
+    /// ìŠ¬ë¡¯ì´ í´ë¦­ë˜ì—ˆì„ ë•Œ ì‹¤í–‰ë˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
     public Action<uint> onClick;
 
     /// <summary>
-    /// ½½·Ô¿¡ ¸¶¿ì½º°¡ µé¾î¿ÔÀ» ¶§ ½ÇÇàµÇ´Â µ¨¸®°ÔÀÌÆ®
+    /// ìŠ¬ë¡¯ì— ë§ˆìš°ìŠ¤ê°€ ë“¤ì–´ì™”ì„ ë•Œ ì‹¤í–‰ë˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
     public Action<uint> onPointerEnter;
 
     /// <summary>
-    /// ½½·Ô¿¡¼­ ¸¶¿ì½º°¡ ³ª°¬À» ¶§ ½ÇÇàµÇ´Â µ¨¸®°ÔÀÌÆ®
+    /// ìŠ¬ë¡¯ì—ì„œ ë§ˆìš°ìŠ¤ê°€ ë‚˜ê°”ì„ ë•Œ ì‹¤í–‰ë˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
     public Action<uint> onPointerExit;
 
-
     /// <summary>
-    /// ½½·Ô À§¿¡¼­ ¸¶¿ì½º°¡ ¿òÁ÷ÀÏ ¶§ ½ÇÇàµÇ´Â µ¨¸®°ÔÀÌÆ®
+    /// ìŠ¬ë¡¯ ìœ„ì—ì„œ ë§ˆìš°ìŠ¤ê°€ ì›€ì§ì¼ ë•Œ ì‹¤í–‰ë˜ëŠ” ë¸ë¦¬ê²Œì´íŠ¸
     /// </summary>
     public Action<Vector2> onPointerMove;
 
-    TempItemSlotUI tempSlotUI;
-
     /// <summary>
-    /// ÀÌ ½½·ÔUI¸¦ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
+    /// ì´ ìŠ¬ë¡¯UIë¥¼ ì´ˆê¸°í™”í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <param name="id">ÀÌ ½½·ÔUIÀÇ ID</param>
-    /// <param name="slot">ÀÌ ½½·ÔUI°¡ º¸¿©ÁÙ ItemSlot</param>
+    /// <param name="id">ì´ ìŠ¬ë¡¯UIì˜ ID</param>
+    /// <param name="slot">ì´ ìŠ¬ë¡¯UIê°€ ë³´ì—¬ì¤„ ItemSlot</param>
     public override void InitializeSlot(uint id, ItemSlot slot)
     {
-        // µ¨¸®°ÔÀÌÆ®¿¡ ÀÌÀü ¿µÇâ Á¦°ÅÇÏ±â
-        onDragBegin = null;
+        // ë¸ë¦¬ê²Œì´íŠ¸ì— ì´ì „ ì˜í–¥ ì œê±°í•˜ê¸°
+        onDragBegin = null; 
         onDragEnd = null;
         onClick = null;
         onPointerEnter = null;
         onPointerExit = null;
         onPointerMove = null;
-        
 
-        // ºÎ¸ğ°¡ Ã³¸®ÇÏ´Â °Í
+        // ë¶€ëª¨ê°€ ì²˜ë¦¬í•˜ëŠ” ê²ƒ
         base.InitializeSlot(id, slot);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log($"µå·¡±× ½ÃÀÛ : {ID}¹ø ½½·Ô");
-        onDragBegin?.Invoke(ID);    // µ¨¸®°ÔÀÌÆ®·Î ÀÌ ½½·Ô¿¡¼­ µå·¡±×°¡ ½ÃÀÛµÇ¾úÀ½À» ¾Ë¸²
+        Debug.Log($"ë“œë˜ê·¸ ì‹œì‘ : {ID}ë²ˆ ìŠ¬ë¡¯");
+        onDragBegin?.Invoke(ID);    // ë¸ë¦¬ê²Œì´íŠ¸ë¡œ ì´ ìŠ¬ë¡¯ì—ì„œ ë“œë˜ê·¸ê°€ ì‹œì‘ë˜ì—ˆìŒì„ ì•Œë¦¼
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        //OnBeginDrag¿Í OnEndDrag¸¦ À§ÇØ Ãß°¡ÇÑ °Í
+        //OnBeginDragì™€ OnEndDragë¥¼ ìœ„í•´ ì¶”ê°€í•œ ê²ƒ
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        GameObject obj = eventData.pointerCurrentRaycast.gameObject;    // µå·¡±×°¡ ³¡³­ ÁöÁ¡ÀÇ °ÔÀÓ ¿ÀºêÁ§Æ® °¡Á®¿À±â
-        if (obj != null)
+        GameObject obj = eventData.pointerCurrentRaycast.gameObject;    // ë“œë˜ê·¸ê°€ ëë‚œ ì§€ì ì˜ ê²Œì„ ì˜¤ë¸Œì íŠ¸ ê°€ì ¸ì˜¤ê¸°
+        if( obj != null)
         {
-            // ¿ÀºêÁ§Æ®°¡ ÀÖÀ¸¸é 
+            // ì˜¤ë¸Œì íŠ¸ê°€ ìˆìœ¼ë©´ 
             ItemSlotUI endSlot = obj.GetComponent<ItemSlotUI>();
-            if (endSlot != null)   // ½½·ÔÀÎÁö È®ÀÎ
+            if( endSlot != null )   // ìŠ¬ë¡¯ì¸ì§€ í™•ì¸
             {
-                // ½½·ÔÀÌ¸é µ¨¸®°ÔÀÌÆ®·Î ÀÌ ½½·Ô¿¡¼­ µå·¡±×°¡ ³¡³µÀ½À» ¾Ë¸²
+                // ìŠ¬ë¡¯ì´ë©´ ë¸ë¦¬ê²Œì´íŠ¸ë¡œ ì´ ìŠ¬ë¡¯ì—ì„œ ë“œë˜ê·¸ê°€ ëë‚¬ìŒì„ ì•Œë¦¼
                 onDragEnd?.Invoke(endSlot.ID, true);
-                Debug.Log($"µå·¡±× Á¾·á : {endSlot.ID}¹ø ½½·Ô");
+                Debug.Log($"ë“œë˜ê·¸ ì¢…ë£Œ : {endSlot.ID}ë²ˆ ìŠ¬ë¡¯");
             }
             else
             {
                 onDragEnd?.Invoke(ID, false);
-                Debug.Log("½½·ÔÀÌ ¾Æ´Õ´Ï´Ù., ¿ø·¡ ½½·ÔÀ¸·Î µÇµ¹¸³´Ï´Ù.");
+                Debug.Log("ìŠ¬ë¡¯ì´ ì•„ë‹™ë‹ˆë‹¤. ì›ë˜ ìŠ¬ë¡¯ìœ¼ë¡œ ë˜ëŒë¦½ë‹ˆë‹¤.");
             }
         }
         else
         {
-            Debug.Log("¿ÀºêÁ§Æ®°¡ ¾ø½À´Ï´Ù.");
+            Debug.Log("ì˜¤ë¸Œì íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
         }
     }
 
     /// <summary>
-    /// ½½·ÔÀ» Å¬¸¯ÇßÀ» ¶§ ½ÇÇàµÇ´Â ÇÔ¼ö.
-    /// ÀÓ½Ã ½½·Ô¿¡ ÀÖ´Â ¾ÆÀÌÅÛÀ» ÀÌ ½½·Ô¿¡ ³Ö±â À§ÇÑ ¿ëµµ
-    /// (¾ÆÀÌÅÛ ºĞ¸®ÇÏ±â À§ÇÑ ¿ëµµ)
+    /// ìŠ¬ë¡¯ì„ í´ë¦­í–ˆì„ ë•Œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜.
+    /// ì„ì‹œ ìŠ¬ë¡¯ì— ìˆëŠ” ì•„ì´í…œì„ ì´ ìŠ¬ë¡¯ì— ë„£ê¸° ìœ„í•œ ìš©ë„
+    /// (ì•„ì´í…œ ë¶„ë¦¬í•˜ê¸° ìœ„í•œ ìš©ë„)
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
-        onClick?.Invoke(ID);    // Å¬¸¯µÇ¾ú´Ù°í ½ÅÈ£¸¸ º¸³»±â
+        onClick?.Invoke(ID);    // í´ë¦­ë˜ì—ˆë‹¤ê³  ì‹ í˜¸ë§Œ ë³´ë‚´ê¸°
     }
 
     /// <summary>
-    /// »ó¼¼ Á¤º¸Ã¢ ¿­°í ´İ´Â °ÍÀÌ ÁÖ ¸ñÀû 
+    /// ìƒì„¸ ì •ë³´ì°½ ì—´ê³  ë‹«ëŠ” ê²ƒì´ ì£¼ ëª©ì 
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
@@ -117,7 +113,7 @@ public class ItemSlotUI : ItemSlotUI_Base, IDragHandler, IBeginDragHandler, IEnd
     }
 
     /// <summary>
-    /// »ó¼¼Á¤º¸Ã¢ ¿­°í ´İ´Â°ÍÀÌ ÁÖ ¸ñÀû
+    /// ìƒì„¸ ì •ë³´ì°½ ì—´ê³  ë‹«ëŠ” ê²ƒì´ ì£¼ ëª©ì 
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerExit(PointerEventData eventData)
@@ -126,7 +122,7 @@ public class ItemSlotUI : ItemSlotUI_Base, IDragHandler, IBeginDragHandler, IEnd
     }
 
     /// <summary>
-    /// ½½·Ô À§¿¡¼­ ¿òÁ÷ÀÓÀÌ ÀÖ¾ú´ø °ÍÀ» ÀÎº¥Åä¸®UI¿¡ Àü´ŞÇÏ´Â °ÍÀÌ ÁÖ ¸ñÀû
+    /// ìŠ¬ë¡¯ ìœ„ì—ì„œ ì›€ì§ì„ì´ ìˆì—ˆë˜ ê²ƒì„ ì¸ë²¤í† ë¦¬UIì— ì „ë‹¬í•˜ëŠ” ê²ƒì´ ì£¼ ëª©ì 
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerMove(PointerEventData eventData)

@@ -4,16 +4,21 @@ using UnityEngine;
 
 public enum ItemCode
 {
-    Ruby =0,
+    Ruby = 0,
     Emerald,
-    Sapphire
+    Sapphire,
+    CopperCoin,
+    SilverCoin,
+    GoldCoin,
+    Food,
+    Beer
 }
 
 public enum ItemSortBy
 {
-    ID,     // ID ±âÁØÀ¸·Î Á¤·Ä
-    Name,   // ÀÌ¸§ ±âÁØ
-    Price   // °¡°İ ±âÁØ
+    Code,   // ì½”ë“œ ê¸°ì¤€ìœ¼ë¡œ ì •ë ¬
+    Name,   // ì´ë¦„ ê¸°ì¤€
+    Price   // ê°€ê²© ê¸°ì¤€
 }
 
 public class ItemDataManager : MonoBehaviour

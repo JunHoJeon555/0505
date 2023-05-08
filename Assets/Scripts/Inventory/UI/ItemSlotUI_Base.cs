@@ -8,73 +8,69 @@ using System;
 public class ItemSlotUI_Base : MonoBehaviour
 {
     /// <summary>
-    /// ÀÎº¥Åä¸®ÀÇ ¸î ¹øÂ° ½½·Ô°ú ¿¬°áµÇ¾ú´ÂÁö. ¸î¹øÂ° ½½·ÔÀÎÁö.
+    /// ì¸ë²¤í† ë¦¬ì˜ ëª‡ë²ˆì§¸ ìŠ¬ë¡¯ê³¼ ì—°ê²°ë˜ì—ˆëŠ”ì§€. ì´ ìŠ¬ë¡¯ì´ ëª‡ë²ˆì§¸ ìŠ¬ë¡¯ì¸ì§€.
     /// </summary>
     uint id;
     public uint ID => id;
 
     /// <summary>
-    /// ÀÌ UI¿Í ¿¬°áµÈ ItemSlot
+    /// ì´ UIì™€ ì—°ê²°ëœ ItemSlot
     /// </summary>
     ItemSlot itemSlot;
     public ItemSlot ItemSlot => itemSlot;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛ ¾ÆÀÌÄÜ Ç¥½Ã¿ë ÀÌ¹ÌÁö
+    /// ì•„ì´í…œ ì•„ì´ì½˜ í‘œì‹œìš© ì´ë¯¸ì§€
     /// </summary>
     Image itemImage;
 
     /// <summary>
-    /// ¾ÆÀÌÅÛ °¹¼ö Ç¥½Ã¿ë ÅØ½ºÆ®
+    /// ì•„ì´í…œ ê°¯ìˆ˜ í‘œì‹œìš© í…ìŠ¤íŠ¸
     /// </summary>
     TextMeshProUGUI itemCount;
 
     private void Awake()
     {
         Transform child = transform.GetChild(0);
-        itemImage= child.GetComponent<Image>();
-
+        itemImage = child.GetComponent<Image>();
         child = transform.GetChild(1);
         itemCount = child.GetComponent<TextMeshProUGUI>();
     }
-
-    /// <summary>
-    /// ½½·Ô ÃÊ±âÈ­¿ë ÇÔ¼ö
-    /// </summary>
-    /// <param name="id">½½·Ô ÀÎµ¦½º. ½½·ÔIDÀÇ ¿ªÇÒµµ ÇÔ</param>
-    /// <param name="slot">ÀÌ UI°¡ º¸¿©ÁÙ ItemSlot</param>
-    public virtual void InitializeSlot(uint id, ItemSlot slot)
-    {
-        Debug.Log($"{id} ½½·Ô ÃÊ±âÈ­");
-        this.id = id;       //°ª ¼³Á¤
-        itemSlot = slot;
-        itemSlot.onSlotItemChange = Refresh;    //½½·Ô¿¡ µé¾îÀÖ´Â ¾ÆÀÌÅÛÀÌ º¯°æµÇ¾úÀ» ¶§ ½ÇÇà µÉ ÇÔ¼öµî·Ï
-
-        Refresh();          //º¸ÀÌ´Â ¸ğ½À ÃÊ±âÈ­
-    }
-
     
     /// <summary>
-    /// ½½·ÔÀÇ º¸ÀÌ´Â ¸ğ½ÀÀ» °»½ÅÇÏ´Â ÇÔ¼ö
-    /// itemSlot¿¡ µé¾îÀÖ´Â ¾ÆÀÌÅÛÀÌ º¯°æµÉ ¶§¸¶´Ù ½ÇÇà.
+    /// ìŠ¬ë¡¯ ì´ˆê¸°í™”ìš© í•¨ìˆ˜
+    /// </summary>
+    /// <param name="id">ìŠ¬ë¡¯ ì¸ë±ìŠ¤. ìŠ¬ë¡¯ IDì˜ ì—­í• ë„ í•¨</param>
+    /// <param name="slot">ì´ UIê°€ ë³´ì—¬ì¤„ ItemSlot</param>
+    public virtual void InitializeSlot(uint id, ItemSlot slot)
+    {
+        //Debug.Log($"{id} ìŠ¬ë¡¯ ì´ˆê¸°í™”");
+        this.id = id;       // ê°’ ì„¤ì •
+        itemSlot = slot;
+        itemSlot.onSlotItemChange = Refresh;    // ìŠ¬ë¡¯ì— ë“¤ì–´ìˆëŠ” ì•„ì´í…œì´ ë³€ê²½ë˜ì—ˆì„ ë•Œ ì‹¤í–‰ë  í•¨ìˆ˜ ë“±ë¡
+
+        Refresh();          // ë³´ì´ëŠ” ëª¨ìŠµ ì´ˆê¸°í™”
+    }
+
+    /// <summary>
+    /// ìŠ¬ë¡¯ì˜ ë³´ì´ëŠ” ëª¨ìŠµ ê°±ì‹ ìš© í•¨ìˆ˜
+    /// itemSlotì— ë“¤ì–´ìˆëŠ” ì•„ì´í…œì´ ë³€ê²½ë  ë•Œë§ˆë‹¤ ì‹¤í–‰.
     /// </summary>
     private void Refresh()
     {
-        if(itemSlot.IsEmpty)
+        if (itemSlot.IsEmpty)
         {
-            //½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ µé¾îÀÖÁö ¾ÊÀ» ¶§
-            itemImage.sprite = null;        //ÀÌ¹ÌÁö Á¦°Å
-            itemImage.color = Color.clear;  //color¿¡´Â ¾ËÆÄ°ª Á¶ÀıÀÌ ¾ø´Ù.
-            itemCount.text = string.Empty;  //°¹¼ö ºñ¿ì±â
-        
-        }   
+            // ìŠ¬ë¡¯ì— ì•„ì´í…œì´ ë“¤ì–´ìˆì§€ ì•Šì„ ë•Œ
+            itemImage.sprite = null;        // ì´ë¯¸ì§€ ì œê±°í•˜ê³ 
+            itemImage.color = Color.clear;  // íˆ¬ëª…í•˜ê²Œ ë§Œë“¤ê³ 
+            itemCount.text = string.Empty;  // ê°¯ìˆ˜ë„ ë¹„ìš°ê¸°
+        }
         else
         {
-            //½½·Ô¿¡ ¾ÆÀÌÅÛÀÌ µé¾îÀÖÀ» ¶§
-            itemImage.sprite = itemSlot.ItemData.itemIcon;      //ÀÌ¹ÌÁö ¼³Á¤ÇÏ±â
-            itemImage.color = Color.white;                      //ºÒÅõ¸íÇÏ°Ô ¸¸µé±â
-            itemCount.text = ItemSlot.ItemCount.ToString();      //°¹¼ö ±ÛÀÚ·Î ³Ö±â
-
+            // ìŠ¬ë¡¯ì— ì•„ì´í…œì´ ë“¤ì–´ìˆì„ ë•Œ
+            itemImage.sprite = itemSlot.ItemData.itemIcon;      // ì´ë¯¸ì§€ ì„¤ì •í•˜ê³ 
+            itemImage.color = Color.white;                      // ë¶ˆíˆ¬ëª…í•˜ê²Œ ë§Œë“¤ê¸°
+            itemCount.text = ItemSlot.ItemCount.ToString();     // ê°¯ìˆ˜ ê¸€ìë¡œ ë„£ê¸°
         }
     }
 }
