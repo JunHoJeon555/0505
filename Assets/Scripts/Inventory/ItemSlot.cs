@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ItemSlot
@@ -10,6 +11,7 @@ public class ItemSlot
     /// </summary>
     uint slotIndex;
     public uint Index => slotIndex;
+
 
     /// <summary>
     /// 이 슬롯에 들어있는 아이템 종류
@@ -51,12 +53,29 @@ public class ItemSlot
     }
 
     /// <summary>
+    /// 이 슬롯의 아이템이 장비되었는지 여부
+    /// </summary>
+    bool isEquipped = false;
+    public bool IsEquipped
+    {
+        get => isEquipped;
+        set
+        {
+            isEquipped= value;
+            onSlotItemChange?.Invoke();
+        }
+    }
+
+    /// <summary>
     /// 생성자
     /// </summary>
     /// <param name="index">이 슬롯이 인벤토리에서 몇번째 슬롯인지(인덱스)</param>
     public ItemSlot(uint index)
     {
         slotIndex = index;  // slotIndex는 이 이후로 절대 변경하지 않아야 한다.
+        ItemCount = 0;
+        IsEquipped= false;
+        
     }
 
     /// <summary>
@@ -70,6 +89,7 @@ public class ItemSlot
         {
             ItemData = data;    // data가 null이 아니면 파라메터로 설정
             ItemCount = count;
+            IsEquipped = false;
             Debug.Log($"인벤토리 {slotIndex}슬롯에 \"{ItemData.itemName}\" 아이템이 {ItemCount}개 설정");
         }
         else
@@ -83,6 +103,7 @@ public class ItemSlot
     {
         ItemData = null;
         ItemCount = 0;
+        IsEquipped = false;
         Debug.Log($"인벤토리 {slotIndex}슬롯을 비웁니다.");
     }
 
@@ -145,6 +166,35 @@ public class ItemSlot
             Debug.Log($"인벤토리 {slotIndex}번 슬롯에 " +
                 $"\"{ItemData.itemName}\"아이템이 {decreaseCount}개 감소. " +
                 $"현재 {ItemCount}개.");
+        }
+    }
+
+    /// <summary>
+    /// 아이템을 사용하는 함수
+    /// </summary>
+    /// <param name="target"></param>
+    public void UseItem(GameObject target)
+    {
+        IUsable usable = ItemData as IUsable;
+        if( usable != null )                //사용 가능한 아이템이면
+        {
+            if (usable.Use(target))         //사용 시도하고
+            {
+                DecreaseSlotItem();         //사용에 성공하면 갯수 하나 감소
+            }
+        }
+    }
+
+    /// <summary>
+    /// 아이템을 장비/해제하는함수
+    /// </summary>
+    /// <param name="target">아이템을 장비하는 </param>
+    public void EquipItem(GameObject target)
+    {
+        IEquipable equipable = ItemData as IEquipable;
+        if(equipable != null ) 
+        {
+            equipable.AutoEquipUnequip(target, this);
         }
     }
 }

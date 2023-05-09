@@ -1,12 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
+
+    
     /// <summary>
     /// 슬롯을 다시 만들때 필요한 프리팹
     /// </summary>
@@ -46,6 +49,7 @@ public class InventoryUI : MonoBehaviour
 
     PlayerInputActions inputActions;
     bool isShiftPress = false;
+
 
     private void Awake()
     {
@@ -151,6 +155,10 @@ public class InventoryUI : MonoBehaviour
     /// <param name="slotID">드래그 시작 슬롯의 ID</param>
     private void OnItemMoveBegin(uint slotID)
     {
+        if (inven[slotID].IsEquipped)           //드래그 시작할 때 장비되어있으면 장비 해제
+        {
+            inven[slotID].EquipItem(Owner.gameObject);
+        }
         inven.MoveItem(slotID, tempSlotUI.ID);  // 시작 슬롯의 내용과 임시 슬롯의 내용을 서로 교체시키기
         tempSlotUI.Open();                      // 임시 슬롯 보이게 만들기
     }
@@ -197,7 +205,10 @@ public class InventoryUI : MonoBehaviour
             }
             else
             {
-                // 아이템 사용 용도로 클릭했다.
+                // 아이템 사용 또는 장비하기위한 용도로 클릭했다.
+                inven[slotID].UseItem(Owner.gameObject);    //소유자에게 아이템 사용하기
+
+                inven[slotID].EquipItem(Owner.gameObject);  //소유자가 아이템 장비/해제해보기
             }
         }
     }

@@ -29,7 +29,7 @@ public class ItemSlotUI_Base : MonoBehaviour
     /// </summary>
     TextMeshProUGUI itemCount;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         Transform child = transform.GetChild(0);
         itemImage = child.GetComponent<Image>();
@@ -72,5 +72,14 @@ public class ItemSlotUI_Base : MonoBehaviour
             itemImage.color = Color.white;                      // 불투명하게 만들기
             itemCount.text = ItemSlot.ItemCount.ToString();     // 갯수 글자로 넣기
         }
+
+        OnRefresh();
+    }
+
+
+
+    protected virtual void OnRefresh()
+    {
+      
     }
 }

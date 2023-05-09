@@ -6,15 +6,15 @@ using UnityEngine;
 
 public class ItemData_Food : ItemData, IConsumable
 {
-    [Header("À½½Ä ¾ÆÀÌÅÛ µ¥ÀÌÅÍ")]
+    [Header("ìŒì‹ ì•„ì´í…œ ë°ì´í„°")]
 
     /// <summary>
-    /// ÀüÃ¼ È¸º¹·®
+    /// ì „ì²´ íšŒë³µëŸ‰
     /// </summary>
     public float healthAmount;
 
     /// <summary>
-    /// ÀüÃ¼ È¸º¹½Ã°£
+    /// ì „ì²´ íšŒë³µì‹œê°„
     /// </summary>
     public float duration;
 

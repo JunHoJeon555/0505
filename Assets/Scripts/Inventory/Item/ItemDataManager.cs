@@ -11,7 +11,18 @@ public enum ItemCode
     SilverCoin,
     GoldCoin,
     Food,
-    Beer
+    Beer,
+    HealingPotion,
+    ManaPotion,
+    IronSword,
+    SilverSword,
+    OldSword
+}
+
+public enum EquipType
+{
+    Weapon =0,
+    Shield
 }
 
 public enum ItemSortBy

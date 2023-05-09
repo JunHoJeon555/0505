@@ -10,12 +10,14 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
-public class Player : MonoBehaviour, IHealth , IMana
+public class Player : MonoBehaviour, IHealth , IMana , IEquipTarget
 {
     /// <summary>
     /// 이 플레이어가 가지고 있을 인벤토리
     /// </summary>
     Inventory inven;
+
+    public Inventory Inventory => inven;    //테스트 용도
 
     /// <summary>
     /// 플레이어가 가지고 있는 돈
@@ -112,6 +114,26 @@ public class Player : MonoBehaviour, IHealth , IMana
     /// </summary>
     public Action<float> onManaChange { get; set; }
 
+    /// <summary>
+    /// 무기가 장비될 트랜스폼
+    /// </summary>
+    public Transform weaponParent;
+
+    /// <summary>
+    /// 방패가 장비될 트랜스폼
+    /// </summary>
+    public Transform shieldParent;
+
+    /// <summary>
+    /// 장비아이템의 부위별 장비 상태(장비한 아이템이 있는 슬롯)
+    /// </summary>
+    ItemSlot[] partsSlots;
+
+    /// <summary>
+    /// 장비 아이템의 부위별 장비 상태(true면 장비중, false면 장비 안함)
+    /// </summary>
+    public ItemSlot this[EquipType part] => partsSlots[(int)part];
+
 
     /// <summary>
     /// 돈이 변경되었을 때 실행될 델리게이트
@@ -125,10 +147,17 @@ public class Player : MonoBehaviour, IHealth , IMana
 
     PlayerController playerController;
 
+
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
         playerController.onItemPickUp = OnItemPickUp;   // 아이템 줍는다는 신호가 들어오면 줍는 처리 실행
+
+        //partsEquip = new bool[Enum.GetValues(typeof(EquipType)).Length];//EquipType 갯수만큼 배역 크기 확보
+        partsSlots = new ItemSlot[Enum.GetValues(typeof(EquipType)).Length];
+        //new bool[Enum.GetValues(typeof(EquipType)).Length];
+
     }
 
     private void Start()
@@ -216,7 +245,57 @@ public class Player : MonoBehaviour, IHealth , IMana
             yield return null;
         }
     }
-   
+
+    
+    /// <summary>
+    /// 아이템을 장비하는 함수
+    /// </summary>
+    /// <param name="part">아이템을 장비할 부위</param>
+    /// <param name="slot">장비할 아이템이 들어있는 슬롯</param>
+    /// <exception cref="NotImplementedException"></exception>
+    public void EquipItem(EquipType part, ItemSlot slot)
+    {
+        ItemData_Equip equip = slot.ItemData as ItemData_Equip;
+        if(equip != null )
+        {
+            Transform partParent = GetPartTransform(part);
+            GameObject.Instantiate(equip.equipPrefab, partParent);      //생성하고
+            partsSlots[(int)part] = slot;                                //기록해놓기
+        }
+    }
+
+    public void UnEquipItem(EquipType part)
+    {
+        Transform partParent = GetPartTransform(part);
+        while(partParent.childCount > 0)                    //손에 붙어있는것 모두 제거
+        {
+            Transform child = partParent.GetChild(0);
+            child.SetParent(null);
+            Destroy(child.gameObject);
+        }
+            partsSlots[(int)part] = null;                    //기록비우기
+    }
+
+    /// <summary>
+    /// 장비아이템이 붙은 부모 ㅊ트랜스폼 찾아주는 함수
+    /// </summary>
+    /// <param name="part">장비아이템 종류</param>
+    /// <returns>장비아이템이 붙은 부모 트랜스폼</returns>
+    public Transform GetPartTransform(EquipType part)
+    {
+       Transform result = null;
+        switch (part)
+        {
+            case EquipType.Weapon:
+                result = weaponParent;
+                break;
+            case EquipType.Shield:
+                result = shieldParent;
+                break;
+        }
+        return result;
+    }
+
 
 
     /// <summary>
@@ -240,8 +319,5 @@ public class Player : MonoBehaviour, IHealth , IMana
         // 아이템 획득 반경 그리기
         Handles.DrawWireDisc(transform.position, Vector3.up, ItemPickupRange);        
     }
-
-  
-
 #endif
 }
