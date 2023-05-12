@@ -15,5 +15,5 @@ public class ItemData_Weapon : ItemData_Equip
     /// <summary>
     /// 무기가 장착될 파츠
     /// </summary>
-    public new EquipType EquipPart => EquipType.Weapon;
+    public override EquipType EquipPart => EquipType.Weapon;
 }

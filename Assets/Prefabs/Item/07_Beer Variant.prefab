@@ -16,7 +16,7 @@ PrefabInstance:
     - target: {fileID: 6215348021405745241, guid: 96f8410fd716b9c47b9a859fec0f52e8,
         type: 3}
       propertyPath: m_Name
-      value: 07_Beer
+      value: 07_Beer Variant
       objectReference: {fileID: 0}
     - target: {fileID: 6215348021405745254, guid: 96f8410fd716b9c47b9a859fec0f52e8,
         type: 3}
@@ -72,6 +72,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6681737611688666496, guid: 96f8410fd716b9c47b9a859fec0f52e8,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96f8410fd716b9c47b9a859fec0f52e8, type: 3}

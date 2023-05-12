@@ -16,7 +16,9 @@ public enum ItemCode
     ManaPotion,
     IronSword,
     SilverSword,
-    OldSword
+    OldSword,
+    RoundShield,
+    KiteShield
 }
 
 public enum EquipType

@@ -13,7 +13,7 @@ public class ItemData_Equip : ItemData, IEquipable
     /// <summary>
     /// 장착될 위치를 알려주는 프로퍼티
     /// </summary>
-    public EquipType EquipPart => EquipType.Weapon;  //인터페이스 구현해야하기 때문에 만든것
+    public virtual EquipType EquipPart => EquipType.Weapon;  //인터페이스 구현해야하기 때문에 만든것
 
     /// <summary>
     /// 아이템 장비하는 함수

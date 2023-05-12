@@ -9,7 +9,7 @@ interface IHealth
     /// 살았는지 죽었는지 확인하는 프로퍼티
     /// </summary>
     bool IsAlive { get; }
-
+    
     /// <summary>
     /// HP 확인 및 설정용 프로퍼티
     /// </summary>

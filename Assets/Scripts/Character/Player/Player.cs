@@ -145,9 +145,17 @@ public class Player : MonoBehaviour, IHealth , IMana , IEquipTarget
     /// </summary>
     public float ItemPickupRange = 2.0f;
 
+    /// <summary>
+    /// 무기 활성화 비활성화 
+    /// </summary>
+    Action<bool> onWeaponEnable;
+
+    /// <summary>
+    /// 무기 이펙트
+    /// </summary>
+    Action<bool> onWeaponEffectEnable;
+
     PlayerController playerController;
-
-
 
     private void Awake()
     {
@@ -259,8 +267,16 @@ public class Player : MonoBehaviour, IHealth , IMana , IEquipTarget
         if(equip != null )
         {
             Transform partParent = GetPartTransform(part);
-            GameObject.Instantiate(equip.equipPrefab, partParent);      //생성하고
+            GameObject obj = Instantiate(equip.equipPrefab, partParent);      //생성하고
             partsSlots[(int)part] = slot;                                //기록해놓기
+            slot.IsEquipped = true;
+
+            if(part == EquipType.Weapon)
+            {
+                Weapon weapon = obj.GetComponent<Weapon>();
+                onWeaponEnable = weapon.ColliderEnable;
+                onWeaponEffectEnable = weapon.EffectPlay;
+            }
         }
     }
 
@@ -273,7 +289,14 @@ public class Player : MonoBehaviour, IHealth , IMana , IEquipTarget
             child.SetParent(null);
             Destroy(child.gameObject);
         }
+            partsSlots[(int)part].IsEquipped = false;
             partsSlots[(int)part] = null;                    //기록비우기
+
+        if (part == EquipType.Weapon)
+        {
+            onWeaponEnable = null;
+            onWeaponEffectEnable = null;
+        }
     }
 
     /// <summary>
@@ -296,6 +319,40 @@ public class Player : MonoBehaviour, IHealth , IMana , IEquipTarget
         return result;
     }
 
+    /// <summary>
+    /// 무기 콜라이더 활성화하라고 신호 보내는 함수,(애니메이션에서 실행 시킴)
+    /// </summary>
+    public void WeaponEnable()
+    {
+        onWeaponEnable?.Invoke(true);
+    }
+
+    /// <summary>
+    /// 무기 콜라이더 비활성화하라고 신호 보내는 함수,(애니메이션에서 실행 시킴)
+    /// </summary>
+    public void WeaponDisable()
+    {
+        onWeaponEnable?.Invoke(false);
+    }
+
+    /// <summary>
+    /// 무기 이팩트 활성화/ 비활성화하라고 신호보내는 함수(Attack 계역 애니메이션 실행 시킴)
+    /// </summary>
+    /// <param name="enable"></param>
+    public void WeaponEffectEnable(bool enable)
+    {
+        onWeaponEffectEnable?.Invoke(enable);
+    }
+
+    /// <summary>
+    /// 무기와 방패를 표시하거나 표시하지 않는 함수
+    /// </summary>
+    /// <param name="isShow">true면Enable false = Disable</param>
+    public void ShowWeaponAndShield(bool isShow)
+    {
+        weaponParent.gameObject.SetActive(isShow);
+        shieldParent.gameObject.SetActive(isShow);
+    }
 
 
     /// <summary>

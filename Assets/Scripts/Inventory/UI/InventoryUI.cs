@@ -47,14 +47,37 @@ public class InventoryUI : MonoBehaviour
     /// </summary>
     MoneyPanel money;
 
+    /// <summary>
+    /// 인벤토리 닫기 버튼
+    /// </summary>
+    Button closeButton;
+
     PlayerInputActions inputActions;
     bool isShiftPress = false;
 
+    /// <summary>
+    /// 인벤토리 열고 닫는 효과를 위한 컴포넌ㅌ,
+    /// </summary>
+    CanvasGroup canvasGroup;
+
+    /// <summary>
+    /// 인벤토리가 열렸을 때 실행될 델리게이트
+    /// </summary>
+    Action onInventoryOpen;
+
+    /// <summary>
+    /// 인벤토리가 닫혔을 때 실행될 델리게이트
+    /// </summary>
+    Action onInventoryClose;
 
     private void Awake()
     {
+        canvasGroup = GetComponent<CanvasGroup>();  
         Transform slotParent = transform.GetChild(0);
         slotUIs = slotParent.GetComponentsInChildren<ItemSlotUI>();
+
+        Transform child = transform.GetChild(1);
+        closeButton= child.GetComponent<Button>();
 
         tempSlotUI = GetComponentInChildren<TempItemSlotUI>();
 
@@ -74,10 +97,14 @@ public class InventoryUI : MonoBehaviour
         inputActions.UI.Shift.performed += OnShiftPress;
         inputActions.UI.Shift.canceled += OnShiftPress;
         inputActions.UI.Click.canceled += OnItemDrop;
+        inputActions.UI.InventoryOnOff.performed += OnInventoryShortcut;
     }
+
+
 
     private void OnDisable()
     {
+        inputActions.UI.InventoryOnOff.performed -= OnInventoryShortcut;
         inputActions.UI.Click.canceled -= OnItemDrop;
         inputActions.UI.Shift.canceled -= OnShiftPress;
         inputActions.UI.Shift.performed -= OnShiftPress;
@@ -309,6 +336,36 @@ public class InventoryUI : MonoBehaviour
 
         return min.x < screenPos.x && screenPos.x < max.x && min.y < screenPos.y && screenPos.y < max.y;
     }
+
+    private void OnInventoryShortcut(InputAction.CallbackContext obj)
+    {
+        if(!canvasGroup.blocksRaycasts)
+        {
+            Open();
+        }
+        else
+        {
+            Close();
+        }
+    }
+
+    private void Close()
+    {
+        canvasGroup.alpha = 0.0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+        onInventoryClose?.Invoke();
+    }
+
+    private void Open()
+    {
+        canvasGroup.alpha = 1.0f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+        onInventoryOpen?.Invoke();
+    }
+
+
 
     /// <summary>
     /// 테스트 용도

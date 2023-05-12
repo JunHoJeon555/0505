@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 011968942637f744aa6dc0d7b3407563, type: 3}
+  m_Name: 14_KiteShield
+  m_EditorClassIdentifier: 
+  code: 14
+  itemName: "\uCE74\uC774\uD2B8 \uC2E4\uB4DC"
+  modelPrefab: {fileID: 5367073880484492215, guid: 610cc64c5044d1c44b71f6c2972b6416,
+    type: 3}
+  itemIcon: {fileID: 21300000, guid: 256205b9c6ca12c45ab7762da8a65631, type: 3}
+  price: 0
+  maxStackCount: 1
+  itemDescription: "\uC124\uBA85"
+  equipPrefab: {fileID: 5610884078883986163, guid: 4cf771e5dba391243aff2ed71fe1e631,
+    type: 3}
+  defencePower: 15

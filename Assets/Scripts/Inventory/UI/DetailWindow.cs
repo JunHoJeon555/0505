@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class DetailWindow : MonoBehaviour
 {
+    public float maxAlpha = 0.7f;
     public float alphaChangeSpeed = 5.0f;
     float alphaTarget = 0.0f;
 
@@ -55,7 +56,7 @@ public class DetailWindow : MonoBehaviour
         {
             canvasGroup.alpha -= Time.deltaTime * alphaChangeSpeed;
         }
-        canvasGroup.alpha = Mathf.Clamp(canvasGroup.alpha, 0.0f, 1.0f);
+        canvasGroup.alpha = Mathf.Clamp(canvasGroup.alpha, 0.0f, maxAlpha);
     }
 
     /// <summary>
